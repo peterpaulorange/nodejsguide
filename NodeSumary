@@ -1,0 +1,497 @@
+source: https://raw.githubusercontent.com/amaravindmenon/NodeJS-Cheatsheet/main/node.txt
+npm init
+
+npm install express 
+
+
+create a file name it (app.js)
+
+-------Basic node hello world----------
+
+const express = require('express');
+const app = express()
+const PORT = 5000
+
+app.get('/',(req,res)=> {
+    res.send("Hello world")
+})
+
+app.listen(PORT,()=>{
+    console.log("Server is running",PORT)
+})
+
+
+
+--------To Run-------------- 
+
+node app(filename)
+
+autorestart server nodemon
+or install nodemon
+
+npm install nodemon -g
+
+after that 
+
+nodemon app(filename)
+
+-------------MIDDLEWARE-------------
+
+create a MIDDLEWARE
+
+
+const express = require('express');
+const app = express()
+const PORT = 5000
+
+
+const customeMiddleware = () => {
+    console.log(middleware executed)
+}
+
+app.use(customeMiddleware)
+
+app.get('/',(req,res)=> {
+    res.send("Hello world")
+})
+
+app.listen(PORT,()=>{
+    console.log("Server is running",PORT)
+})
+
+
+-------------Setup MIDDLEWARE-------------
+
+setup a MIDDLEWARE
+
+const express = require('express');
+const app = express()
+const PORT = 5000
+
+
+const customeMiddleware = (req,res,next) => {
+    console.log("middleware executed")
+    next()
+}
+
+app.use(customeMiddleware)
+
+app.get('/',(req,res)=> {
+    console.log("Home")
+    res.send("Hello world")
+})
+
+app.listen(PORT,()=>{
+    console.log("Server is running",PORT)
+})
+
+
+-------------Custom MIDDLEWARE-------------
+
+Setup  for any one function
+
+
+
+const express = require('express');
+const app = express()
+const PORT = 5000
+
+
+const customeMiddleware = (req,res,next) => {
+    console.log("middleware executed")
+    next()
+}
+
+app.get('/',(req,res)=> {
+    console.log("Home")
+    res.send("Hello world")
+})
+
+app.get('/about',customeMiddleware,(req,res)=> {
+    console.log("Home")
+    res.send("Hello world")
+})
+
+app.listen(PORT,()=>{
+    console.log("Server is running",PORT)
+})
+
+
+
+-------------Setup mongoDB-----------------
+
+create a file keys.js(filename)
+
+module.exports={
+    MONGOURI:" link of the mongodb "
+}
+
+install mongoose
+
+npm install mongoose
+
+
+const express = require('express');
+const app = express()
+const mongoose = require('mongoose')
+const PORT = 5000
+const{MONGOURI}= require("./keys.js")
+
+
+mongoose.connect(MONGOURI,{
+    useNewUrlParser:true,
+    useunifiedTopology: true
+})
+mongoose.connection.on('connected',()=>{
+    console.log("Connected to mongo")
+})
+mongoose.connection.on('error',(err)=>{
+    console.log("error connecting",err)
+})
+
+
+app.listen(PORT,()=>{
+    console.log("Server is running",PORT)
+})
+
+
+
+------------------------------------------ PART 2 SIMPLE LOGIN PROJECT ----------------------------------------------------
+
+npm init
+
+npm i express ejs bcrypt
+
+npm i --save-dev nodemon dotenv
+
+create file
+.gitignore
+
+type
+.env
+node_modules
+
+on package.json
+
+scripts: {
+    "devstart": "nodemon server.js"
+
+}
+
+
+to start 
+npm run devstart
+
+
+
+create a file server.js
+
+type
+const express = require('express')
+const app = express()
+
+app.set('view-engine','ejs')
+
+app.get('/', (req,res) => {
+    res.render('index.ejs',{ name: 'aravind' })
+})
+
+app.listen(3000)
+
+
+
+-----------views-------------
+create folder views
+
+create file index.ejs
+
+<h1>hi <%= name %> </h1>
+
+create another file register.ejs
+
+create another file login.ejs
+
+
+
+add get route in server.js
+
+
+const express = require('express')
+const app = express()
+
+app.set('view-engine','ejs')
+
+app.get('/', (req,res) => {
+    res.render('index.ejs',{ name: req.user.name })
+})
+app.get('/login', (req,res) => {
+    res.render('login.ejs')
+})
+app.get('/register', (req,res) => {
+    res.render('register.ejs')
+})
+
+
+
+app.listen(3000)
+
+
+
+NOw design the page 
+
+go to register.ejs
+<h1> Register </h1>
+<form action="/register" method="POST">
+<div>
+    <label for="name">NAME</label>
+    <input type="text" id="name" name="name" required>
+    <label for="name">NAME</label>
+    <input type="text" id="name" name="name" required> 
+    <label for="name">NAME</label>
+    <input type="text" id="name" name="name" required>
+
+    <button type="submit">Register</submit>
+</div>
+</form>
+<a href="/login">login</a> 
+
+
+
+Design same for login(Copy and set)
+
+
+
+
+Add line on server.js
+
+app.post('/login',(req,res)=> {
+
+})
+
+app.post('/register',(req,res)=> {
+
+})
+
+
+
+under app.set
+type
+app.use(express.urlencoded({ extended: false}))
+
+
+now for saving in local variable 
+create empty array in top
+const users = []
+
+add bcrypt for passwrd at header
+const bcrypt = require('bcrypt')
+
+now verify register 
+
+app.post('/register', async (req,res)=> {
+    try{
+        const hashedpassword = await bcrypt.hash(req.body.password, 10 )
+        users.push({
+            id = Date.now().toString(),
+            name = req.body.name,
+            name = req.body.name,
+            name = req.body.name,
+            password = hashedpassword
+        })
+        res.redirect('/login')  
+    }catch{
+        res.redirect('/register')
+    }
+       console.log(users)    <================= To check if the data are being fetched or not
+})
+
+
+
+install passport
+npm i passport passport-local express-session express-flash
+
+
+
+create a passport config file
+
+create file passport-config.js
+
+type
+const LocalStrategy = require('passport-local').Strategy
+const bcrypt =require('bcrypt')
+
+function initialize(passport, getUserByEmail, getUserByID) {
+
+    const authenticateUser = async (email , password, done) => {
+        const user = getUserByEmail(email)
+        if (user == null) {
+            return done(null, false , { message: "user error no email id found"}
+        }
+        try {
+            if (await bcrypt.compare(password, user.password)) {
+                return done(null, user)
+            } else {
+                return done(null , false , {message: "password incorrect"})
+            }
+        } catch (e){
+            return done(e)
+        }
+    }
+    passport.use(new LocalStrategy({ usernameField: 'email' },
+    authenticateUser))
+    passport.serializeUser((user,done)=> done(null,user.id))
+    passport.deserializeUser((id,done)=> {
+       return done(null,getUserByID(id))
+        })
+
+}
+module.exports = initialize
+
+
+
+in server.js
+
+const passport = require('passport')
+
+const initializePassport = require('./passport-config')
+initializePassport(passport, 
+    email => users.find(user => user.email === email),
+    id => users.find(user => user.id === id)
+
+)
+
+
+
+adding flash
+
+const flash = require('express-flash')
+const session = require('express-session')
+
+under express.urlencoded
+app.use(flash())
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}))
+app.use(passport.initialize())
+app.use(passport.session())
+
+
+
+Now in dot env file
+
+SESSION_SECRET = secret
+
+
+in server.js header
+
+if (process.env.NODE_ENV !== 'prodcution') {
+    require('dotenv').config()
+}
+
+
+
+now in server.js
+
+(change)
+app.post('/login', passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+    failureFlash: true
+}))
+
+
+in login.ejs
+
+on top
+<% if(messages.error) { %>
+<%= messages.error %>
+<% } %>
+
+
+to stay away from error messages
+
+in server.js
+
+secondlast line
+
+function checkAuthenticated(req,res,next) => {
+    if(req.isAuthenticated()){
+        return next()
+    }
+    res.redirect('/login')
+}
+
+
+(change)
+app.get('/', checkAuthenticated, (req,res) => {
+    res.render('index.ejs',{ name: req.user.name })
+})
+
+
+function checkNotAuthenticated(req,res,next) => {
+    if(req.isAuthenticated()){
+        return res.redirect('/')
+    }
+    next()
+}   
+
+(change)
+app.get('/login', checkNotAuthenticated, (req,res) => {
+    res.render('login.ejs')
+})
+
+
+(change)
+app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+    failureFlash: true
+}))
+
+app.get('/register', checkNotAuthenticated, (req,res) => {
+    res.render('register.ejs')
+})
+
+app.post('/register', checkNotAuthenticated, async (req,res)=> {
+    try{
+        const hashedpassword = await bcrypt.hash(req.body.password, 10 )
+        users.push({
+            id = Date.now().toString(),
+            name = req.body.name,
+            name = req.body.name,
+            name = req.body.name,
+            password = hashedpassword
+        })
+        res.redirect('/login')  
+    }catch{
+        res.redirect('/register')
+    }
+       console.log(users)    <================= To check if the data are being fetched or not
+})
+
+
+--Logout structure--
+
+in server.js before function
+
+app.delete('/logout',(req,res)=>{
+    req.logOut()
+    res.redirect('/login')
+})
+
+install package 
+npm i method-override
+
+on top add header
+
+const methodOverride = require('method-override')
+
+under use clause
+app.use(methodOverride('_method'))
+
+under index.ejs
+<form action="/logout?_method=DELETE" method="POST">
+    <button type="submit">Log Out </button> 
+</form>
