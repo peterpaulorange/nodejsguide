@@ -1,0 +1,1232 @@
+source: https://raw.githubusercontent.com/soulwire/Makisu/master/index.html
+<!doctype html>
+<html>
+<head>
+    <title>Makisu ~ CSS 3D Dropdown Concept</title>
+    <link href='http://fonts.googleapis.com/css?family=Days+One' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="header">
+        <hgroup>
+            <h1>Makisu</h1>
+            <h2>CSS 3D Dropdown Concept</h2>
+        </hgroup>
+    </header>
+
+    <section class="demo">
+
+        <dl class="list nigiri">
+            <dt>Nigiri</dt>
+            <dd><a href="#">Maguro</a></dd>
+            <dd><a href="#">Sake</a></dd>
+            <dd><a href="#">Unagi</a></dd>
+            <dd><a href="#">Buri</a></dd>
+            <dd><a href="#">Suzuki</a></dd>
+            <dd><a href="#">Saba</a></dd>
+            <dd><a href="#">Iwashi</a></dd>
+            <dd><a href="#">Kohada</a></dd>
+            <dd><a href="#">Hirame</a></dd>
+            <dd><a href="#">Tobiwo</a></dd>
+        </dl>
+
+        <dl class="list maki">
+            <dt>Maki</dt>
+            <dd><a href="#">Ana-kyu</a></dd>
+            <dd><a href="#">Chutoro</a></dd>
+            <dd><a href="#">Kaiware</a></dd>
+            <dd><a href="#">Kampyo</a></dd>
+            <dd><a href="#">Kappa</a></dd>
+            <dd><a href="#">Natto</a></dd>
+            <dd><a href="#">Negitoro</a></dd>
+            <dd><a href="#">Oshinko</a></dd>
+            <dd><a href="#">Otoro</a></dd>
+            <dd><a href="#">Tekka</a></dd>
+        </dl>
+
+        <dl class="list sashimi">
+            <dt>Sashimi</dt>
+            <dd><a href="#">Maguro</a></dd>
+            <dd><a href="#">Toro</a></dd>
+            <dd><a href="#">Ebi</a></dd>
+            <dd><a href="#">Saba</a></dd>
+            <dd><a href="#">Ika</a></dd>
+            <dd><a href="#">Tako</a></dd>
+            <dd><a href="#">Tomago</a></dd>
+            <dd><a href="#">Kani</a></dd>
+            <dd><a href="#">Katsuo</a></dd>
+            <dd><a href="#">Maguro</a></dd>
+        </dl>
+
+        <a href="#" class="toggle">Toggle</a>
+
+    </section>
+
+    <div class="warning">
+        <div class="message">
+            <h1>CSS 3D Not Detected :(</h1>
+            <p>I couldn't detect your browser's CSS 3D capabilities. If I'm wrong, please <a href="https://github.com/soulwire/Makisu/issues" target="_blank">file an issue</a>, otherwise, try a <a href="http://www.google.com/chrome" target="_blank">sexier browser</a></p>
+        </div>
+    </div>
+
+    <a href="https://github.com/soulwire/Makisu" target="_blank"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+    <script src="js/makisu.js"></script>
+    <script>
+
+        // The `enabled` flag will be `false` if CSS 3D isn't available
+
+        if ( $.fn.makisu.enabled ) {
+
+            var $sashimi = $( '.sashimi' );
+            var $nigiri = $( '.nigiri' );
+            var $maki = $( '.maki' );
+
+            // Create Makisus
+
+            $nigiri.makisu({
+                selector: 'dd',
+                overlap: 0.85,
+                speed: 1.7
+            });
+
+            $maki.makisu({
+                selector: 'dd',
+                overlap: 0.6,
+                speed: 0.85
+            });
+
+            $sashimi.makisu({
+                selector: 'dd',
+                overlap: 0.2,
+                speed: 0.5
+            });
+
+            // Open all
+            
+            $( '.list' ).makisu( 'open' );
+
+            // Toggle on click
+
+            $( '.toggle' ).on( 'click', function() {
+                $( '.list' ).makisu( 'toggle' );
+            });
+
+            // Disable all links
+
+            $( '.demo a' ).click( function( event ) {
+                event.preventDefault();
+            });
+
+        } else {
+
+            $( '.warning' ).show();
+        }
+
+    </script>
+</body>
+</html>
+
+source: https://raw.githubusercontent.com/soulwire/Makisu/master/js/makisu.js
+
+/**
+ * Copyright (C) 2012 by Justin Windle
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+(function($) {
+
+    // Global initialisation flag
+    var initialized = false;
+
+    // For detecting browser prefix and capabilities
+    var element = document.createElement( 'div' );
+    var vendors = 'moz ms o webkit'.split( ' ' );
+    var toupper = function( str ) { return str.toUpperCase(); };
+
+    // Establish vendor prefix and CSS 3D support
+    var vendor;
+
+    for ( var prop, i = 0; i < vendors.length; i++ ) {
+
+        prop = ( vendor = vendors[i] ) + 'Perspective';
+        if ( prop in element.style || prop.replace( /^(\w)/, toupper ) in element.style ) break;
+    }
+
+    var canRun = !!vendor;
+    var prefix = '-' + vendor + '-';
+
+    var $this, $root, $base, $kids, $node, $item, $over, $back;
+    var wait, anim, last;
+
+    // Public API
+    var api = {
+
+        // Toggle open / closed
+        toggle: function() {
+
+            $this = $( this );
+            $this.makisu( $this.hasClass( 'open' ) ? 'close' : 'open' );
+        },
+
+        // Trigger the unfold animation
+        open: function( speed, overlap, easing ) {
+
+            // Cache DOM references
+            $this = $(this);
+            $root = $this.find( '.root' );
+            $kids = $this.find( '.node' ).not( $root );
+
+            // Establish values or fallbacks
+            speed = utils.resolve( $this, 'speed', speed );
+            easing = utils.resolve( $this, 'easing', easing );
+            overlap = utils.resolve( $this, 'overlap', overlap );
+
+            $kids.each( function( index, el ) {
+
+                // Establish settings for this iteration
+                anim = 'unfold' + ( !index ? '-first' : '' );
+                last = index === $kids.length - 1;
+                time = speed * ( 1 - overlap );
+                wait = index * time;
+
+                // Cache DOM references
+                $item = $( el );
+                $over = $item.find( '.over' );
+
+                // Element animation
+                $item.css(utils.prefix({
+                    'transform': 'rotateX(180deg)',
+                    'animation': anim + ' ' + speed + 's ' + easing + ' ' + wait + 's 1 normal forwards'
+                }));
+
+                // Shading animation happens when the next item starts
+                if ( !last ) wait = ( index + 1 ) * time;
+
+                // Shading animation
+                $over.css(utils.prefix({
+                    'animation': 'unfold-over ' + (speed * 0.45) + 's ' + easing + ' ' + wait + 's 1 normal forwards'
+                }));
+            });
+
+            // Add momentum to the container
+            $root.css(utils.prefix({
+                'animation': 'swing-out ' + ( $kids.length * time * 1.4 ) + 's ease-in-out 0s 1 normal forwards'
+            }));
+
+            $this.addClass( 'open' );
+        },
+
+        // Trigger the fold animation
+        close: function( speed, overlap, easing ) {
+
+            // Cache DOM references
+            $this = $(this);
+            $root = $this.find( '.root' );
+            $kids = $this.find( '.node' ).not( $root );
+
+            // Establish values or fallbacks
+            speed = utils.resolve( $this, 'speed', speed ) * 0.66;
+            easing = utils.resolve( $this, 'easing', easing );
+            overlap = utils.resolve( $this, 'overlap', overlap );
+
+            $kids.each( function( index, el ) {
+
+                // Establish settings for this iteration
+                anim = 'fold' + ( !index ? '-first' : '' );
+                last = index === 0;
+                time = speed * ( 1 - overlap );
+                wait = ( $kids.length - index - 1 ) * time;
+
+                // Cache DOM references
+                $item = $( el );
+                $over = $item.find( '.over' );
+
+                // Element animation
+                $item.css(utils.prefix({
+                    'transform': 'rotateX(0deg)',
+                    'animation': anim + ' ' + speed + 's ' + easing + ' ' + wait + 's 1 normal forwards'
+                }));
+
+                // Adjust delay for shading
+                if ( !last ) wait = ( ( $kids.length - index - 2 ) * time ) + ( speed * 0.35 );
+
+                // Shading animation
+                $over.css(utils.prefix({
+                    'animation': 'fold-over ' + (speed * 0.45) + 's ' + easing + ' ' + wait + 's 1 normal forwards'
+                }));
+            });
+
+            // Add momentum to the container
+            $root.css(utils.prefix({
+                'animation': 'swing-in ' + ( $kids.length * time * 1.0 ) + 's ease-in-out 0s 1 normal forwards'
+            }));
+
+            $this.removeClass( 'open' );
+        }
+    };
+
+    // Utils
+    var utils = {
+
+        // Resolves argument values to defaults
+        resolve: function( $el, key, val ) {
+            return typeof val === 'undefined' ? $el.data( key ) : val;
+        },
+
+        // Prefixes a hash of styles with the current vendor
+        prefix: function( style ) {
+
+            for ( var key in style ) {
+                style[ prefix + key ] = style[ key ];
+            }
+
+            return style;
+        },
+
+        // Inserts rules into the document styles
+        inject: function( rule ) {
+
+            try {
+
+                var style = document.createElement( 'style' );
+                style.innerHTML = rule;
+                document.getElementsByTagName( 'head' )[0].appendChild( style );
+
+            } catch ( error ) {}
+        },
+
+        keyframes: function( name, frames ) {
+
+            var anim = '@' + prefix + 'keyframes ' + name + '{';
+
+            for ( var frame in frames )
+
+                anim += frame + '%' + '{' + prefix + frames[ frame ] + ';}';
+
+            utils.inject( anim + '}' );
+        }
+    };
+
+    // Element templates
+    var markup = {
+        node: '<span class="node"/>',
+        back: '<span class="face back"/>',
+        over: '<span class="face over"/>'
+    };
+
+    // Plugin definition
+    $.fn.makisu = function( options ) {
+
+        // Notify if 3D isn't available
+        if ( !canRun ) {
+
+            var message = 'Failed to detect CSS 3D support';
+
+            if( console && console.warn ) {
+
+                // Print warning to the console
+                console.warn( message );
+
+                // Trigger errors on elements
+                this.each( function() {
+                    $( this ).trigger( 'error', message );
+                });
+            }
+
+            return;
+        }
+
+        // Fires only once
+        if ( !initialized ) {
+
+            initialized = true;
+
+            // Unfold
+
+            utils.keyframes( 'unfold', {
+                  0: 'transform: rotateX(180deg)',
+                 50: 'transform: rotateX(-30deg)',
+                100: 'transform: rotateX(0deg)'
+            });
+
+            // Unfold (first item)
+            utils.keyframes( 'unfold-first', {
+                  0: 'transform: rotateX(-90deg)',
+                 50: 'transform: rotateX(60deg)',
+                100: 'transform: rotateX(0deg)'
+            });
+
+            // Fold
+            utils.keyframes( 'fold', {
+                  0: 'transform: rotateX(0deg)',
+                100: 'transform: rotateX(180deg)'
+            });
+
+            // Fold (first item)
+            utils.keyframes( 'fold-first', {
+                  0: 'transform: rotateX(0deg)',
+                100: 'transform: rotateX(-180deg)'
+            });
+
+            // Swing out
+            utils.keyframes( 'swing-out', {
+                  0: 'transform: rotateX(0deg)',
+                 30: 'transform: rotateX(-30deg)',
+                 60: 'transform: rotateX(15deg)',
+                100: 'transform: rotateX(0deg)'
+            });
+
+            // Swing in
+            utils.keyframes( 'swing-in', {
+                  0: 'transform: rotateX(0deg)',
+                 50: 'transform: rotateX(-10deg)',
+                 90: 'transform: rotateX(15deg)',
+                100: 'transform: rotateX(0deg)'
+            });
+
+            // Shading (unfold)
+            utils.keyframes( 'unfold-over', {
+                  0: 'opacity: 1.0',
+                100: 'opacity: 0.0'
+            });
+
+            // Shading (fold)
+            utils.keyframes( 'fold-over', {
+                  0: 'opacity: 0.0',
+                100: 'opacity: 1.0'
+            });
+
+            // Node styles
+            utils.inject( '.node {' +
+                'position: relative;' +
+                'display: block;' +
+                '}');
+
+            // Face styles
+            utils.inject( '.face {' +
+                'pointer-events: none;' +
+                'position: absolute;' +
+                'display: block;' +
+                'height: 100%;' +
+                'width: 100%;' +
+                'left: 0;' +
+                'top: 0;' +
+                '}');
+        }
+
+        // Merge options & defaults
+        var opts = $.extend( {}, $.fn.makisu.defaults, options );
+
+        // Extract api method arguments
+        var args = Array.prototype.slice.call( arguments, 1 );
+
+        // Main plugin loop
+        return this.each( function () {
+
+            // If the user is calling a method...
+            if ( api[ options ] ) {
+                return api[ options ].apply( this, args );
+            }
+
+            // Store options in view
+            $this = $( this ).data( opts );
+
+            // Only proceed if the scene hierarchy isn't already built
+            if ( !$this.data( 'initialized' ) ) {
+
+                $this.data( 'initialized', true );
+
+                // Select the first level of matching child elements
+                $kids = $this.children( opts.selector );
+
+                // Build a scene graph for elements
+                $root = $( markup.node ).addClass( 'root' );
+                $base = $root;
+
+                // Process each element and insert into hierarchy
+                $kids.each( function( index, el ) {
+
+                    $item = $( el );
+
+                    // Which animation should this node use?
+                    anim = 'fold' + ( !index ? '-first' : '' );
+
+                    // Since we're adding absolutely positioned children
+                    $item.css( 'position', 'relative' );
+
+                    // Give the item some depth to avoid clipping artefacts
+                    $item.css(utils.prefix({
+                        'transform-style': 'preserve-3d',
+                        'transform': 'translateZ(-0.1px)'
+                    }));
+
+                    // Create back face
+                    $back = $( markup.back );
+                    $back.css( 'background', $item.css( 'background' ) );
+                    $back.css(utils.prefix({ 'transform': 'translateZ(-0.1px)' }));
+
+                    // Create shading
+                    $over = $( markup.over );
+                    $over.css(utils.prefix({ 'transform': 'translateZ(0.1px)' }));
+                    $over.css({
+                        'background': opts.shading,
+                        'opacity': 0.0
+                    });
+
+                    // Begin folded
+                    $node = $( markup.node ).append( $item );
+                    $node.css(utils.prefix({
+                        'transform-origin': '50% 0%',
+                        'transform-style': 'preserve-3d',
+                        'animation': anim + ' 1ms linear 0s 1 normal forwards'
+                    }));
+
+                    // Build display list
+                    $item.append( $over );
+                    $item.append( $back );
+                    $base.append( $node );
+
+                    // Use as parent in next iteration
+                    $base = $node;
+                });
+
+                // Set root transform settings
+                $root.css(utils.prefix({
+                    'transform-origin': '50% 0%',
+                    'transform-style': 'preserve-3d'
+                }));
+
+                // Apply perspective
+                $this.css(utils.prefix({
+                    'transform': 'perspective(' + opts.perspective + 'px)'
+                }));
+
+                // Display the scene
+                $this.append( $root );
+            }
+        });
+    };
+
+    // Default options
+    $.fn.makisu.defaults = {
+
+        // Perspective to apply to rotating elements
+        perspective: 1200,
+
+        // Default shading to apply (null => no shading)
+        shading: 'rgba(0,0,0,0.12)',
+
+        // Area of rotation (fraction or pixel value)
+        selector: null,
+
+        // Fraction of speed (0-1)
+        overlap: 0.6,
+
+        // Duration per element
+        speed: 0.8,
+
+        // Animation curve
+        easing: 'ease-in-out'
+    };
+
+    $.fn.makisu.enabled = canRun;
+
+})( jQuery );
+
+source: https://raw.githubusercontent.com/soulwire/Makisu/master/js/makisu.min.js
+/**
+ * Copyright (C) 2012 by Justin Windle
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+ !function(e){for(var r,t,o=!1,a=document.createElement("div"),n="moz ms o webkit".split(" "),s=function(e){return e.toUpperCase()},i=0;i<n.length&&(t=(r=n[i])+"Perspective",!(t in a.style||t.replace(/^(\w)/,s)in a.style));i++);var f,d,l,c,m,p,u,g,v,y,h,k=!!r,X="-"+r+"-",x={toggle:function(){f=e(this),f.makisu(f.hasClass("open")?"close":"open")},open:function(r,t,o){f=e(this),d=f.find(".root"),c=f.find(".node").not(d),r=w.resolve(f,"speed",r),o=w.resolve(f,"easing",o),t=w.resolve(f,"overlap",t),c.each(function(a,n){y="unfold"+(a?"":"-first"),h=a===c.length-1,time=r*(1-t),v=a*time,p=e(n),u=p.find(".over"),p.css(w.prefix({transform:"rotateX(180deg)",animation:y+" "+r+"s "+o+" "+v+"s 1 normal forwards"})),h||(v=(a+1)*time),u.css(w.prefix({animation:"unfold-over "+.45*r+"s "+o+" "+v+"s 1 normal forwards"}))}),d.css(w.prefix({animation:"swing-out "+1.4*c.length*time+"s ease-in-out 0s 1 normal forwards"})),f.addClass("open")},close:function(r,t,o){f=e(this),d=f.find(".root"),c=f.find(".node").not(d),r=.66*w.resolve(f,"speed",r),o=w.resolve(f,"easing",o),t=w.resolve(f,"overlap",t),c.each(function(a,n){y="fold"+(a?"":"-first"),h=0===a,time=r*(1-t),v=(c.length-a-1)*time,p=e(n),u=p.find(".over"),p.css(w.prefix({transform:"rotateX(0deg)",animation:y+" "+r+"s "+o+" "+v+"s 1 normal forwards"})),h||(v=(c.length-a-2)*time+.35*r),u.css(w.prefix({animation:"fold-over "+.45*r+"s "+o+" "+v+"s 1 normal forwards"}))}),d.css(w.prefix({animation:"swing-in "+1*c.length*time+"s ease-in-out 0s 1 normal forwards"})),f.removeClass("open")}},w={resolve:function(e,r,t){return"undefined"==typeof t?e.data(r):t},prefix:function(e){for(var r in e)e[X+r]=e[r];return e},inject:function(e){try{var r=document.createElement("style");r.innerHTML=e,document.getElementsByTagName("head")[0].appendChild(r)}catch(t){}},keyframes:function(e,r){var t="@"+X+"keyframes "+e+"{";for(var o in r)t+=o+"%"+"{"+X+r[o]+";}";w.inject(t+"}")}},b={node:'<span class="node"/>',back:'<span class="face back"/>',over:'<span class="face over"/>'};e.fn.makisu=function(r){if(!k){var t="Failed to detect CSS 3D support";return console&&console.warn&&(console.warn(t),this.each(function(){e(this).trigger("error",t)})),void 0}o||(o=!0,w.keyframes("unfold",{0:"transform: rotateX(180deg)",50:"transform: rotateX(-30deg)",100:"transform: rotateX(0deg)"}),w.keyframes("unfold-first",{0:"transform: rotateX(-90deg)",50:"transform: rotateX(60deg)",100:"transform: rotateX(0deg)"}),w.keyframes("fold",{0:"transform: rotateX(0deg)",100:"transform: rotateX(180deg)"}),w.keyframes("fold-first",{0:"transform: rotateX(0deg)",100:"transform: rotateX(-180deg)"}),w.keyframes("swing-out",{0:"transform: rotateX(0deg)",30:"transform: rotateX(-30deg)",60:"transform: rotateX(15deg)",100:"transform: rotateX(0deg)"}),w.keyframes("swing-in",{0:"transform: rotateX(0deg)",50:"transform: rotateX(-10deg)",90:"transform: rotateX(15deg)",100:"transform: rotateX(0deg)"}),w.keyframes("unfold-over",{0:"opacity: 1.0",100:"opacity: 0.0"}),w.keyframes("fold-over",{0:"opacity: 0.0",100:"opacity: 1.0"}),w.inject(".node {position: relative;display: block;}"),w.inject(".face {pointer-events: none;position: absolute;display: block;height: 100%;width: 100%;left: 0;top: 0;}"));var a=e.extend({},e.fn.makisu.defaults,r),n=Array.prototype.slice.call(arguments,1);return this.each(function(){return x[r]?x[r].apply(this,n):(f=e(this).data(a),f.data("initialized")||(f.data("initialized",!0),c=f.children(a.selector),d=e(b.node).addClass("root"),l=d,c.each(function(r,t){p=e(t),y="fold"+(r?"":"-first"),p.css("position","relative"),p.css(w.prefix({"transform-style":"preserve-3d",transform:"translateZ(-0.1px)"})),g=e(b.back),g.css("background",p.css("background")),g.css(w.prefix({transform:"translateZ(-0.1px)"})),u=e(b.over),u.css(w.prefix({transform:"translateZ(0.1px)"})),u.css({background:a.shading,opacity:0}),m=e(b.node).append(p),m.css(w.prefix({"transform-origin":"50% 0%","transform-style":"preserve-3d",animation:y+" 1ms linear 0s 1 normal forwards"})),p.append(u),p.append(g),l.append(m),l=m}),d.css(w.prefix({"transform-origin":"50% 0%","transform-style":"preserve-3d"})),f.css(w.prefix({transform:"perspective("+a.perspective+"px)"})),f.append(d)),void 0)})},e.fn.makisu.defaults={perspective:1200,shading:"rgba(0,0,0,0.12)",selector:null,overlap:.6,speed:.8,easing:"ease-in-out"},e.fn.makisu.enabled=k}(jQuery);
+ 
+ source: https://raw.githubusercontent.com/soulwire/Makisu/master/css/style.css
+ 
+ 
+html, body {
+
+    -webkit-font-smoothing: antialiased;
+    -moz-font-smoothing: antialiased;
+
+    background: #ffffff;
+    background: -moz-radial-gradient(center, ellipse cover,  #ffffff 0%, #ffffff 26%, #f5f5f5 59%, #f5f5f5 77%, #cecece 100%);
+    background: -webkit-gradient(radial, center center, 0, center center, 100%, color-stop(0%,#ffffff), color-stop(26%,#ffffff), color-stop(59%,#f5f5f5), color-stop(77%,#f5f5f5), color-stop(100%,#cecece));
+    background: -webkit-radial-gradient(center, ellipse cover,  #ffffff 0%,#ffffff 26%,#f5f5f5 59%,#f5f5f5 77%,#cecece 100%);
+    background: -o-radial-gradient(center, ellipse cover,  #ffffff 0%,#ffffff 26%,#f5f5f5 59%,#f5f5f5 77%,#cecece 100%);
+    background: -ms-radial-gradient(center, ellipse cover,  #ffffff 0%,#ffffff 26%,#f5f5f5 59%,#f5f5f5 77%,#cecece 100%);
+    background: radial-gradient(ellipse at center,  #ffffff 0%,#ffffff 26%,#f5f5f5 59%,#f5f5f5 77%,#cecece 100%);
+    font-family: 'Days One', sans-serif;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+
+body:before {
+
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6RDRCNjE4NDcxMDgzMTFFMkFGQkM4MzE4NzI4RjhBMkQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RDRCNjE4NDgxMDgzMTFFMkFGQkM4MzE4NzI4RjhBMkQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpENEI2MTg0NTEwODMxMUUyQUZCQzgzMTg3MjhGOEEyRCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpENEI2MTg0NjEwODMxMUUyQUZCQzgzMTg3MjhGOEEyRCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pp/mixwAABMrSURBVHjaNNrnrptV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);
+    position: absolute;
+    content: '';
+    opacity: 0.8;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+}
+
+a {
+
+    -webkit-transition: all 250ms cubic-bezier(0.230, 1.000, 0.320, 1.000);
+    -moz-transition: all 250ms cubic-bezier(0.230, 1.000, 0.320, 1.000);
+    -ms-transition: all 250ms cubic-bezier(0.230, 1.000, 0.320, 1.000);
+    -o-transition: all 250ms cubic-bezier(0.230, 1.000, 0.320, 1.000);
+    transition: all 250ms cubic-bezier(0.230, 1.000, 0.320, 1.000);
+
+    text-decoration: none;
+}
+
+.header {
+
+    text-align: center;
+    position: absolute;
+    color: #333;
+    width: 100%;
+    top: 9%;
+}
+
+.header h1 {
+
+    letter-spacing: -1px;
+    text-shadow: -2px -1px 1px #fff, 1px 2px 2px rgba(0, 0, 0, 0.2);
+    font-weight: 300;
+    font-size: 36px;
+    margin: 0;
+}
+
+.header h2 {
+
+    text-transform: uppercase;
+    text-shadow: -2px -1px 1px #fff, 1px 1px 1px rgba(0, 0, 0, 0.15);
+    font-weight: 300;
+    font-size: 12px;
+    color: rgba(0,0,0,0.7);
+    margin: 0;
+}
+
+.demo:after {
+
+    box-shadow: 0 1px 16px rgba(0,0,0,0.15);
+    background: #1b1b1b;
+    position: absolute;
+    content: '';
+    height: 10px;
+    width: 100%;
+    top: 0;
+}
+
+/* List styles */
+
+.list {
+
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    -ms-transform-style: preserve-3d;
+    -o-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    
+    text-transform: uppercase;
+    position: absolute;
+    margin-left: -140px;
+    margin-top: -280px;
+    top: 55%;
+}
+
+.list a {
+    
+    display: block;
+    color: #fff;
+}
+
+.list a:hover {
+    text-indent: 20px;
+}
+
+.list dt, .list dd {
+
+    text-indent: 10px;
+    line-height: 55px;
+    background: #E0FBAC;
+    margin: 0;
+    height: 55px;
+    width: 270px;
+    color: #fff;
+}
+
+.list dt {
+
+    /* Since we're hiding elements behind here, we need it in 3d */
+    -webkit-transform: translateZ(0.3px);
+    -moz-transform: translateZ(0.3px);
+    -ms-transform: translateZ(0.3px);
+    -o-transform: translateZ(0.3px);
+    transform: translateZ(0.3px);
+
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    font-size: 15px;
+}
+
+.list dd {
+
+    border-top: 1px dashed rgba(255,255,255,0.3);
+    line-height: 35px;
+    font-size: 11px;
+    height: 35px;
+    margin: 0;
+}
+
+/* UI */
+
+.toggle {
+
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    border-radius: 3px;
+
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    line-height: 50px;
+    margin-left: -70px;
+    margin-top: -20px;
+    background: #2b2b2b;
+    text-align: center;
+    font-size: 12px;
+    position: absolute;
+    height: 50px;
+    bottom: 10%;
+    width: 140px;
+    color: #fff;
+    left: 50%;
+}
+
+.toggle:hover {
+    
+    background: #E42692;
+}
+
+/* No CSS 3D support warning */
+.warning {
+
+    -webkit-transform: translateZ(2px);
+    -moz-transform: translateZ(2px);
+    -ms-transform: translateZ(2px);
+    -o-transform: translateZ(2px);
+    transform: translateZ(2px);
+
+    background: rgba(255,255,255,0.6);
+    position: fixed;
+    display: none;
+    z-index: 999;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+}
+
+.warning .message {
+
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+    border-radius: 5px;
+    text-align: center;
+    margin-left: -150px;
+    margin-top: -60px;
+    line-height: 1.5;
+    background: #222;
+    font-size: 12px;
+    position: absolute;
+    padding: 10px;
+    width: 280px;
+    color: #fff;
+    left: 50%;
+    top: 50%;
+}
+
+.warning .message h1 {
+
+    font-weight: 300;
+    font-size: 14px;
+}
+
+.warning .message a {
+
+    text-decoration: none;
+    color: #73C8A9;
+}
+
+/* Individual styles */
+
+.sashimi dt, .sashimi dd, .sashimi a { background: #73C8A9; }
+.nigiri dt, .nigiri dd, .nigiri a { background: #E32551; }
+.maki dt, .maki dd, .maki a { background: #FFC219; }
+
+.sashimi a:hover { background: #61c19e; }
+.nigiri a:hover { background: #d31b46; }
+.maki a:hover { background: #ffbb00; }
+
+.nigiri {
+
+    -webkit-transform: perspective(1200px) rotateY(40deg) !important;
+    -moz-transform: perspective(1200px) rotateY(40deg) !important;
+    -ms-transform: perspective(1200px) rotateY(40deg) !important;
+    -o-transform: perspective(1200px) rotateY(40deg) !important;
+    transform: perspective(1200px) rotateY(40deg) !important;
+
+    -webkit-transform-origin: 110% 25%;
+    -moz-transform-origin: 110% 25%;
+    -ms-transform-origin: 110% 25%;
+    -o-transform-origin: 110% 25%;
+    transform-origin: 110% 25%;
+
+    left: 20%;
+}
+
+.maki {
+
+    -webkit-transform: perspective(600px) translateZ(1px) !important;
+    -moz-transform: perspective(600px) translateZ(1px) !important;
+    -ms-transform: perspective(600px) translateZ(1px) !important;
+    -o-transform: perspective(600px) translateZ(1px) !important;
+    transform: perspective(600px) translateZ(1px) !important;
+
+    left: 50%;
+}
+
+.sashimi {
+
+    -webkit-transform: perspective(1200px) rotateY(-40deg) !important;
+    -moz-transform: perspective(1200px) rotateY(-40deg) !important;
+    -ms-transform: perspective(1200px) rotateY(-40deg) !important;
+    -o-transform: perspective(1200px) rotateY(-40deg) !important;
+    transform: perspective(1200px) rotateY(-40deg) !important;
+
+    -webkit-transform-origin: -10% 25%;
+    -moz-transform-origin: -10% 25%;
+    -ms-transform-origin: -10% 25%;
+    -o-transform-origin: -10% 25%;
+    transform-origin: -10% 25%;
+
+    left: 80%;
+}
+
+
+---???---
+source: https://raw.githubusercontent.com/smthari/Drop-Down-Menu/master/index.html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i');
+        @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800,900');
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            font-size: 15px;
+            line-height: 1.7;
+            background-color: #fff;
+            transition: all 300ms linear;
+        }
+
+
+        .cd-header {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .header-wrapper {
+            position: relative;
+            width: calc(100% - 100px);
+            margin-left: 50px;
+        }
+
+
+        .nav-but-wrap {
+            position: relative;
+            padding-left: 105px;
+            padding-top: 15px;
+            margin-top: 26px;
+            transition: all 0.3s ease-out;
+        }
+
+        .menu-icon {
+            height: 30px;
+            width: 30px;
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+            display: block;
+        }
+
+        .menu-icon__line {
+            height: 2px;
+            width: 30px;
+            display: block;
+            background-color: #111;
+            margin-bottom: 7px;
+            cursor: pointer;
+            transition: background-color .5s ease;
+            transition: transform .2s ease, background-color .5s ease;
+        }
+
+        .nav:before,
+        .nav:after {
+            content: "";
+            position: fixed;
+            top: 20px;
+            left: 50px;
+            width: 0;
+            height: 0;
+            background-color: rgba(20, 21, 26, 0.6);
+            border-bottom-right-radius: 200%;
+            z-index: -1;
+            transition: border-radius linear 0.8s,
+                width cubic-bezier(0.77, 0, 0.175, 1) 0.6s,
+                height cubic-bezier(0.77, 0, 0.175, 1) 0.6s;
+        }
+
+        .nav:after {
+            background-color: rgba(9, 9, 12, 1);
+            transition-delay: 0s;
+            box-shadow: 6px 7px 28px 0 rgba(16, 16, 16, 0.3);}
+
+        .nav__content {
+            position: fixed;
+            top: 90px;
+            left: 50px;
+            width: 280px;
+            text-align: left;
+        }
+
+        .nav__list {
+            position: relative;
+            padding: 0;
+            margin: 0;
+            z-index: 2;
+        }
+
+        .nav__list-item {
+            position: relative;
+            display: block;
+            transition-delay: 0.8s;
+            opacity: 0;
+            text-align: left;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 22px;
+            line-height: 1.2;
+            letter-spacing: 2px;
+            transform: translate(30px, 0%);
+            transition: opacity .2s ease, transform .2s ease;
+            margin-top: 7px;
+            margin-bottom: 7px;
+        }
+
+        .nav__list-item a {
+            position: relative;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.6);
+            overflow: hidden;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            z-index: 2;
+            padding-left: 40px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            display: inline-block;
+            transition: all 200ms linear;
+        }
+
+        .nav__list-item a:after {
+            position: absolute;
+            content: '';
+            top: 50%;
+            left: 0;
+            width: 5px;
+            height: 0;
+            opacity: 0;
+            background-color: yellow;
+            z-index: 1;
+            transition: all 200ms linear;
+        }
+
+        .nav__list-item a:hover:after {
+            height: 100%;
+            opacity: 1;
+            top: 0;
+        }
+
+        .nav__list-item a:hover {
+            color: rgba(255, 255, 255, 1);
+        }
+
+        .nav__list-item.active-nav a {
+            color: rgba(255, 255, 255, 1);
+        }
+
+        .nav__list-item.active-nav a:after {
+            height: 100%;
+            opacity: 1;
+            top: 0;
+        }
+
+
+        body.nav-active .menu-icon__line {
+            background-color: #fff;
+            transform: translate(0px, 0px) rotate(-45deg);
+        }
+
+        body.nav-active .menu-icon__line-left {
+            width: 15px;
+            transform: translate(2px, 4px) rotate(45deg);
+        }
+
+        body.nav-active .menu-icon__line-right {
+            width: 15px;
+            float: right;
+            transform: translate(-3px, -3.5px) rotate(45deg);
+        }
+
+        body.nav-active .menu-icon:hover .menu-icon__line-left,
+        body.nav-active .menu-icon:hover .menu-icon__line-right {
+            width: 15px;
+        }
+
+
+        body.nav-active .nav:before,
+        body.nav-active .nav:after {
+            width: 250px;
+            height: 350px;
+            border-radius: 15px;
+        }
+
+        body.nav-active .nav:after {
+            transition-delay: .1s;
+        }
+
+        body.nav-active .nav:before {
+            transition-delay: 0s;
+        }
+
+        body.nav-active .nav__list-item {
+            opacity: 1;
+            transform: translateX(0%);
+        }
+
+        body.nav-active .nav__list-item:nth-child(0) {
+            transition-delay: 0.7s;
+        }
+
+        body.nav-active .nav__list-item:nth-child(1) {
+            transition-delay: 0.8s;
+        }
+
+        body.nav-active .nav__list-item:nth-child(2) {
+            transition-delay: 0.9s;
+        }
+
+        body.nav-active .nav__list-item:nth-child(3) {
+            transition-delay: 1s;
+        }
+
+        body.nav-active .nav__list-item:nth-child(4) {
+            transition-delay: 1.1s;
+        }
+
+        body.nav-active .nav__list-item:nth-child(5) {
+            transition-delay: 1.2s;
+        }
+    </style>
+
+</head>
+
+<body>
+    <header class="cd-header">
+        <div class="header-wrapper">
+            <div class="nav-but-wrap">
+                <div class="menu-icon hover-target">
+                    <span class="menu-icon__line menu-icon__line-left"></span>
+                    <span class="menu-icon__line"></span>
+                    <span class="menu-icon__line menu-icon__line-right"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="nav">
+        <div class="nav__content">
+            <ul class="nav__list">
+                <li class="nav__list-item active-nav"><a href="#" class="hover-target">Home</a></li>
+                <li class="nav__list-item"><a href="#" class="hover-target">Services</a></li>
+                <li class="nav__list-item"><a href="#" class="hover-target">Blog</a></li>
+                <li class="nav__list-item"><a href="#" class="hover-target">News</a></li>
+                <li class="nav__list-item"><a href="#" class="hover-target">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+
+
+<script>
+    var app = function () {
+        var body = undefined;
+        var menu = undefined;
+        var menuItems = undefined;
+        var init = function init() {
+            body = document.querySelector('body');
+            menu = document.querySelector('.menu-icon');
+            menuItems = document.querySelectorAll('.nav__list-item');
+            applyListeners();
+        };
+        var applyListeners = function applyListeners() {
+            menu.addEventListener('click', function () {
+                return toggleClass(body, 'nav-active');
+            });
+        };
+        var toggleClass = function toggleClass(element, stringClass) {
+            if (element.classList.contains(stringClass)) element.classList.remove(stringClass); else element.classList.add(stringClass);
+        };
+        init();
+    }();
+</script>
+
+</body>
+
+
+</html>
+
+source: https://raw.githubusercontent.com/smthari/Show-Hide-Password/master/index.html
+<!DOCTYPE html>
+<head>
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+body {
+top: 50%;
+left: 50%;
+position: absolute;
+transform: translate(-50%, -50%);
+background: #111;
+}
+
+.wrapper {
+position: relative;
+height: 55px;
+width: 320px;
+}
+
+input {
+width: 100%;
+height: 100%;
+border: none;
+padding-left: 15px;
+font-size: 18px;
+outline: none;
+border-radius: 15px;
+background: #fff;
+color: #111;
+}
+
+input::placeholder {
+font-size: 17px;
+color: #111;
+opacity: 0.8;
+}
+
+span {
+position: absolute;
+right: 15px;
+top: 50%;
+transform: translateY(-50%);
+font-size: 20px;
+color: #111;
+cursor: pointer;
+display: none;
+}
+
+input:valid~span {
+display: block;
+}
+
+span i.hide-btn::before {
+content: "\f070";
+}
+</style>
+<script src="https://kit.fontawesome.com/dd8c49730d.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+<div class="wrapper">
+<input type="password" placeholder="Enter Password" required>
+<span class="show-btn">
+<i class="far fa-eye"></i>
+</span>
+</div>
+<script>
+  const password = document.querySelector("input");
+  const showpassword = document.querySelector("span i");
+  showpassword.onclick = (() => {
+  if (password.type === "password") {
+  password.type = "text";
+  showpassword.classList.add("hide-btn");
+  } else {
+  password.type = "password";
+  showpassword.classList.remove("hide-btn");
+  }
+  });
+  </script>
+</body>
+</html>
