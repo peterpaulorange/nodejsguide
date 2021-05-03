@@ -1,0 +1,1956 @@
+Source: https://github.com/smthari/Soft-UI-Calculator-Using-Html-css-Javascript/blob/master/index.html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<style>
+@import url('https://fonts.googleapis.com/css?family=Nova+Round&display=swap');
+
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+body {
+height: 100vh;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+background-size: 800% 800%;
+}
+
+.calculator {
+min-width: 273px;
+min-height: 448px;
+background: #5f657d;
+box-shadow: 0px 10px 50px rgba(0, 0, 0, 0.15);
+font-family: Nova Round;
+font-style: normal;
+font-weight: normal;
+font-size: 24px;
+line-height: 29px;
+}
+
+.screen {
+width: 233px;
+height: 91px;
+background: #5f657d;
+box-shadow: inset 1px 1px 12px #1e1f20,
+ -2px -2px 10px rgb(151, 147, 147);
+margin: 20px 20px 20px 20px;
+}
+
+.screenContent {
+text-align: end;
+padding: 17px;
+font-size: 30px;
+}
+
+#result {
+font-size: 30px;
+line-height: 36px;
+margin-bottom: 5px;
+overflow: auto;
+user-select: all;
+}
+
+#resultText {
+color: #F7B731 !important;
+}
+
+.calculation {
+font-size: 12px;
+line-height: 14px;
+color: white;
+overflow: auto;
+}
+
+.numPad {
+width: 233px;
+height: 296px;
+margin: 20px 20px 20px 20px;
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+grid-template-rows: repeat(5, 1fr);
+grid-column-gap: 19px;
+grid-row-gap: 19px;
+}
+
+.style {
+background: #5f657d;
+box-shadow: 6px 6px 12px #1e1f20, 
+-2px -2px 10px rgb(151, 147, 147);
+color: white;
+display: flex;
+justify-content: center;
+align-items: center;
+cursor: pointer;
+}
+
+.styleOnClick {
+box-shadow: inset 2px 2px 4px #191A1E,
+inset -2px -2px 4px rgba(95, 94, 94, 0.25);
+font-size: 20px;
+opacity: 0.8;
+}
+
+.zero {
+width: 107px;
+height: 44px;
+grid-area: 5 / 1 / 6 / 3;
+}
+
+.equal {
+width: 44px;
+height: 170px;
+grid-area: 3 / 4 / 6 / 5;
+}
+</style>
+
+</head>
+
+<body>
+<div class="nightModeToggle">
+<div class="switch"></div>
+</div>
+
+<div class="calculator">
+<div class="screen">
+<div class="screenContent">
+<p id="result">
+<span id="resultText" style=" color: #373737">0</span>
+</p>
+<p class="calculation">
+<span id="calculationText"></span>
+</p>
+</div>
+</div>
+
+<div class="numPad">
+<div id="clear" class="style">C</div>
+<div id="division" class="style">/</div>
+<div id="multiplication" class="style">X</div>
+<div id="subtraction" class="style">-</div>
+<div id="num7" class="style">7</div>
+<div id="num8" class="style">8</div>
+<div id="num9" class="style">9</div>
+<div id="addition" class="style">+</div>
+<div id="num4" class="style">4</div>
+<div id="num5" class="style">5</div>
+<div id="num6" class="style">6</div>
+<div id="num1" class="style">1</div>
+<div id="num2" class="style">2</div>
+<div id="num3" class="style">3</div>
+<div id="num0" class="style zero">0</div>
+<div id="dot" class="style">.</div>
+<div id="equal" class="style equal">=</div>
+</div>
+</div>
+<script>
+
+    for (var item of document.querySelectorAll(".style")) {
+    item.addEventListener("mousedown", function (evt) {
+    evt.target.classList.add("styleOnClick");
+    }, false);
+    }
+    
+    document.getElementById('clear').addEventListener("mousedown", function () {
+    document.querySelector(".style").classList.add("styleOnClick");
+    });
+    
+    document.addEventListener("mouseup", function () {
+    for (var item of document.querySelectorAll(".style")) {
+    item.classList.remove("styleOnClick");
+    }
+    document.querySelector(".style").classList.remove("styleOnClick");
+    });
+    
+    const result = document.getElementById('resultText');
+    const calculation = document.getElementById('calculationText');
+    
+    function formula() {
+    var calMath = '';
+    calculation.textContent.split('').map(element => {
+    if (element === 'x') {
+    calMath += '*';
+    } else {
+    calMath += element;
+    }
+    });
+    return calMath;
+    }
+    
+    function calc(formula) {
+    if (['+', '-', "x", '/'].includes(formula[formula.length - 1])) {
+    formula = formula.slice(0, formula.length - 1);
+    }
+    return eval(formula);
+    }
+    
+    function wrightNum(num) {
+    calculation.textContent += num;
+    }
+    
+    function op(btn) {
+    if (calculation.textContent.length !== 0) {
+    if (!['+', '-', "x", '/'].includes(calculation.textContent[calculation.textContent.length - 1])) {
+    result.textContent = calc(formula());
+    calculation.textContent += btn;
+    } else {
+    calculation.textContent = calculation.textContent.slice(0, formula.length - 1);
+    calculation.textContent += btn;
+    }
+    }
+    }
+    
+    document.getElementById('num0').addEventListener('click', function () {
+    wrightNum(0)
+    }); +
+    document.getElementById('num1').addEventListener('click', function () {
+    wrightNum(1)
+    });
+    document.getElementById('num2').addEventListener('click', function () {
+    wrightNum(2)
+    });
+    document.getElementById('num3').addEventListener('click', function () {
+    wrightNum(3)
+    });
+    document.getElementById('num4').addEventListener('click', function () {
+    wrightNum(4)
+    });
+    document.getElementById('num5').addEventListener('click', function () {
+    wrightNum(5)
+    });
+    document.getElementById('num6').addEventListener('click', function () {
+    wrightNum(6)
+    });
+    document.getElementById('num7').addEventListener('click', function () {
+    wrightNum(7)
+    });
+    document.getElementById('num8').addEventListener('click', function () {
+    wrightNum(8)
+    });
+    document.getElementById('num9').addEventListener('click', function () {
+    wrightNum(9)
+    });
+    
+    
+    document.getElementById('addition').addEventListener('click', function () {
+    op('+')
+    });
+    document.getElementById('subtraction').addEventListener('click', function () {
+    op('-')
+    });
+    document.getElementById('division').addEventListener('click', function () {
+    op('/')
+    });
+    document.getElementById('multiplication').addEventListener('click', function () {
+    op('x')
+    });
+    
+    
+    document.getElementById('clear').addEventListener('click', function () {
+    calculation.textContent = '';
+    result.textContent = 0;
+    });
+    
+    document.getElementById('dot').addEventListener('click', function () {
+    op('.')
+    });
+    
+    document.getElementById('equal').addEventListener('click', function () {
+    result.textContent = (calc(formula()).length !== 0) ? calc(formula()) : result.textContent;
+    calculation.textContent = result.textContent;
+    });
+    
+    </script>
+</body>
+
+</html>
+
+source: https://raw.githubusercontent.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/main/Documentation%20Page/index.html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="index.js"></script>
+</head>
+
+<body>
+
+    <nav id="navbar">
+        <header>Bootstrap Started</header>
+        <ul>
+            <li><a class="nav-link" href="#Introduction">Introduction</a></li>
+            <li><a class="nav-link" href="#Starter_template">Starter template</a></li>
+            <li><a class="nav-link" href="#download">Download</a></li>
+            <li><a class="nav-link" href="#BootstrapCDN">BootstrapCDN</a></li>
+            <li><a class="nav-link" href="#Precompiled_Bootstrap">Precompiled Bootstrap</a></li>
+            <li><a class="nav-link" href="#Bootstrap_source_code">Bootstrap source code</a></li>
+            <li><a class="nav-link" href="#Browsers_and_devices">Browsers and devices</a></li>
+            <li><a class="nav-link" href="#JavaScript">JavaScript</a></li>
+            <li><a class="nav-link" href="#Events">Events</a></li>
+            <li><a class="nav-link" href="#Theming_Bootstrap">Theming Bootstrap</a></li>
+            <li><a class="nav-link" href="#Build_tools">Build tools </a></li>
+            <li><a class="nav-link" href="#Webpack">Webpack</a></li>
+            <li><a class="nav-link" href="#Accessibility">Accessibility</a></li>
+        </ul>
+    </nav>
+
+    <main id="main-doc">
+
+        <section class="main-section" id="Introduction">
+            <header>Introduction</header>
+            <article>
+                <p>
+                    Get started with Bootstrap, the world’s most popular framework for building responsive, mobile-first
+                    sites, with BootstrapCDN and a template starter page.
+                </p>
+                <h2>Quick start</h2>
+                <p>
+                    Looking to quickly add Bootstrap to your project? Use BootstrapCDN, provided for free by the folks
+                    at MaxCDN. Using a package manager or need to download the source files?
+                </p>
+                <h2>CSS</h2>
+                <p>Copy-paste the stylesheet <code class="textcode">link</code> into your <code
+                        class="textcode">head</code> before all other stylesheets to load our CSS.
+                </p>
+                <textarea spellcheck="false" readonly id="select-this0">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"></textarea>
+                <button class="button" onclick="myFunction0()">Click to copy</button>
+
+                <h2>JAVASCRIPT</h2>
+                <P>
+                    Many of our components require the use of JavaScript to function. Specifically,
+                    they require jQuery, Popper.js, and our own JavaScript plugins. Place the following <code
+                        class="textcode">script</code> near the end of your pages, right before the closing
+</body> tag, to enable them. jQuery must come first, then Popper.js, and then our JavaScript plugins.
+</P>
+<p>We use jQuery’s slim build, but the full version is also supported.</p>
+<textarea spellcheck="false" id="select-this2" cols="2" rows="4">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</textarea>
+<button class="button" onclick="myFunction()">Click to copy</button>
+<p>Curious which components explicitly require jQuery, our JS, and Popper.js? Click the show components link below. If
+    you’re at all unsure about the general page structure, keep reading for an example page template.</p>
+</article>
+</section>
+
+<section class="main-section" id="Starter_template">
+    <header>Starter template</header>
+    <article>
+        <p>Be sure to have your pages set up with the latest design and development standards. That means using an HTML5
+            doctype and including a viewport meta tag for proper responsive behaviors. Put it all together and your
+            pages should look like this::</p>
+        <textarea class="startertemplate" spellcheck="false" id="select-this3" cols="2" rows="4"">
+<!doctype html>
+<html lang=" en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<title>Hello, world!</title>
+</head>
+<body>
+<h1>Hello, world!</h1>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
+</textarea>
+        <hr>
+        <p>That’s all you need for overall page requirements. Visit the Layout docs or our official examples to start
+            laying out your site’s content and components.</p>
+    </article>
+</section>
+
+<section class="main-section" id="download">
+    <header>Download</header>
+    <article>
+        <p>
+            Download Bootstrap to get the compiled CSS and JavaScript, source code, or include it with your favorite
+            package managers like npm, RubyGems, and more.
+        </p>
+        <h2>Compiled CSS and JS</h2>
+        <p>
+            Download ready-to-use compiled code for Bootstrap v4.0.0 to easily drop into your project, which includes:
+        </p>
+        <ul>
+            <li>Compiled and minified CSS bundles (see CSS files comparison)</li>
+            <li>Compiled and minified JavaScript plugins</li>
+        </ul>
+        <p>This doesn’t include documentation, source files, or any optional JavaScript dependencies (jQuery and
+            Popper.js).</p>
+        <button class="downloadbtn">Download</button>
+
+        <h2>Source files</h2>
+        <p>
+            Compile Bootstrap with your own asset pipeline by downloading our source Sass, JavaScript, and documentation
+            files. This option requires some additional tooling:
+        </p>
+        <ul>
+            <li>Sass compiler (Libsass or Ruby Sass is supported) for compiling your CSS.</li>
+            <li>Autoprefixer for CSS vendor prefixing</li>
+        </ul>
+        <p>Should you require build tools, they are included for developing Bootstrap and its docs, but they’re likely
+            unsuitable for your own purposes.</p>
+        <button class="downloadbtn" style="width: 150px;">Download source</button>
+    </article>
+</section>
+
+<section class="main-section" id="BootstrapCDN">
+    <header>BootstrapCDN</header>
+    <article>
+        <p>Skip the download with BootstrapCDN to deliver cached version of Bootstrap’s compiled CSS and JS to your
+            project.</p>
+        <textarea spellcheck="false" id="select-this4" cols="3" rows="3">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>      
+</textarea>
+        <button class="button" onclick="myFunction4()">Click to copy</button>
+
+        <p>If you’re using our compiled JavaScript, don’t forget to include CDN versions of jQuery and Popper.js before
+            it.</p>
+        <textarea spellcheck="false" id="select-this5" cols="3" rows="3">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+</textarea>
+        <button class="button" onclick="myFunction5()">Click to copy</button>
+    </article>
+</section>
+
+<section class="main-section" id="Precompiled_Bootstrap">
+    <header>Precompiled Bootstrap</header>
+    <p>Once downloaded, unzip the compressed folder and you’ll see something like this:</p>
+    <pre>
+<code>
+bootstrap/
+├── css/
+│   ├── bootstrap.css
+│   ├── bootstrap.css.map
+│   ├── bootstrap.min.css
+│   ├── bootstrap.min.css.map
+│   ├── bootstrap-grid.css
+│   ├── bootstrap-grid.css.map
+│   ├── bootstrap-grid.min.css
+│   ├── bootstrap-grid.min.css.map
+│   ├── bootstrap-reboot.css
+│   ├── bootstrap-reboot.css.map
+│   ├── bootstrap-reboot.min.css
+│   └── bootstrap-reboot.min.css.map
+└── js/
+├── bootstrap.bundle.js
+├── bootstrap.bundle.min.js
+├── bootstrap.js
+└── bootstrap.min.js
+</code>
+</pre>
+    <p>This is the most basic form of Bootstrap: precompiled files for quick drop-in usage in nearly any web project. We
+        provide compiled CSS and JS (bootstrap.*), as well as compiled and minified CSS and JS (bootstrap.min.*). CSS
+        source maps (bootstrap.*.map) are available for use with certain browsers’ developer tools. Bundled JS files
+        (bootstrap.bundle.js and minified bootstrap.bundle.min.js) include Popper, but not jQuery.</p>
+
+    <h2>CSS files</h2>
+    <p>Bootstrap includes a handful of options for including some or all of our compiled CSS.</p>
+    <div class="tablediv">
+        <table>
+            <thead>
+                <tr>
+                    <th>CSS files</th>
+                    <th>Layout</th>
+                    <th>Content</th>
+                    <th>Components</th>
+                    <th>Utilities</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div><code>bootstrap.css</code></div>
+                        <div><code>bootstrap.min.css</code></div>
+                    </td>
+                    <td class="included">included</td>
+                    <td class="included">included</td>
+                    <td class="included">included</td>
+                    <td class="included">included</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div><code>bootstrap-grid.css</code></div>
+                        <div><code>bootstrap-grid.min.css</code></div>
+                    </td>
+                    <td>Only grid system</td>
+                    <td class="notincluded">Not included</td>
+                    <td class="notincluded">Not included</td>
+                    <td>Only flex utilities</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div><code>bootstrap-reboot.css</code></div>
+                        <div><code>bootstrap-reboot.min.css</code></div>
+                    </td>
+                    <td class="notincluded">Not included</td>
+                    <td>Only Reboot</td>
+                    <td class="notincluded">Not included</td>
+                    <td class="notincluded">Not included</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h2>JS files</h2>
+    <p>Similarly, we have options for including some or all of our compiled JavaScript.</p>
+    <div class="tablediv">
+        <table>
+            <thead>
+                <tr>
+                    <th>JS files</th>
+                    <th>Popper</th>
+                    <th>jQuery</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div><code>bootstrap.bundle.js</code></div>
+                        <div><code>bootstrap.bundle.min.js</code></div>
+                    </td>
+                    <td class="included">included</td>
+                    <td class="notincluded">Not included</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div><code>bootstrap.js</code></div>
+                        <div><code>bootstrap.min.js</code></div>
+                    </td>
+                    <td class="notincluded">Not included</td>
+                    <td class="notincluded">Not included</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+<br>
+
+<section class="main-section" id="Bootstrap_source_code">
+    <header>Bootstrap source code</header>
+    <article>
+        <p>
+            The Bootstrap source code download includes the precompiled CSS and JavaScript assets, along with source
+            Sass, JavaScript, and documentation. More specifically, it includes the following and more:
+        </p>
+        <pre>
+<code>
+bootstrap/
+├── dist/
+│   ├── css/
+│   └── js/
+├── docs/
+│   └── examples/
+├── js/
+└── scss/
+</code>
+</pre>
+
+        <p>
+            The <code class="textcode">scss/</code> and <code class="textcode">js/</code> are the source code for our
+            CSS and JavaScript. The dist/ folder
+            includes everything
+            listed in the precompiled download section above. The <code class="textcode">docs/</code> folder includes
+            the source code for our
+            documentation, and <code class="textcode">examples/</code> of Bootstrap usage. Beyond that, any other
+            included file provides support for
+            packages, license information, and development.
+        </p>
+    </article>
+</section>
+
+<section class="main-section" id="Browsers_and_devices">
+    <header>Browsers and devices</header>
+    <article>
+        <p>
+            Learn about the browsers and devices, from modern to old, that are supported by Bootstrap, including known
+            quirks and bugs for each.
+        </p>
+        <h2>Supported browsers </h2>
+        <p>
+            Bootstrap supports the <b>latest, stable releases</b> of all major browsers and platforms. On Windows, <b>we
+                support
+                Internet Explorer 10-11 / Microsoft Edge.</b>
+        </p>
+        <p>
+            Alternative browsers which use the latest version of WebKit, Blink, or Gecko, whether directly or via the
+            platform’s web view API, are not explicitly supported. However, Bootstrap should (in most cases) display and
+            function correctly in these browsers as well. More specific support information is provided below.
+        </p>
+
+        <h2>Mobile devices</h2>
+        <p>Generally speaking, Bootstrap supports the latest versions of each major platform’s default browsers. Note
+            that proxy browsers (such as Opera Mini, Opera Mobile’s Turbo mode, UC Browser Mini, Amazon Silk) are not
+            supported.</p>
+        <div class="tablediv">
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Chrome</th>
+                        <th>Firefox</th>
+                        <th>Safari </th>
+                        <th>Android Browser & WebView </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            Android
+                        </td>
+                        <td class="included">Supported </td>
+                        <td class="included">Supported </td>
+                        <td class="included">N/A </td>
+                        <td class="included">Android v5.0+ supported </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            iOS
+                        </td>
+                        <td>Supported </td>
+                        <td class="notincluded">Supported</td>
+                        <td class="notincluded">Supported</td>
+                        <td>Only flex utilitie</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Windows 10 Mobile
+                        </td>
+                        <td class="notincluded">N/A </td>
+                        <td>N/A </td>
+                        <td class="notincluded">N/A </td>
+                        <td class="notincluded">N/A </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <h2>Desktop browsers</h2>
+        <p>Similarly, the latest versions of most desktop browsers are supported. </p>
+        <div class="tablediv">
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Chrome </th>
+                        <th>Firefox</th>
+                        <th>Internet Explorer </th>
+                        <th>Microsoft Edge </th>
+                        <th>Opera </th>
+                        <th>Safari</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td> Mac</td>
+                        <td class="included">Supported </td>
+                        <td class="included">Supported </td>
+                        <td>N/A </td>
+                        <td>N/A </td>
+                        <td class="included">Supported </td>
+                        <td class="included">Supported </td>
+
+                    </tr>
+                    <tr>
+                        <td>Windows</td>
+                        <td class="included">Supported </td>
+                        <td class="included">Supported </td>
+                        <td>Supported, IE10+ </td>
+                        <td class="included">Supported </td>
+                        <td class="included">Supported </td>
+                        <td class="notincluded">Not supported </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p>For Firefox, in addition to the latest normal stable release, we also support the latest Extended Support
+            Release (ESR) version of Firefox.</p>
+        <p>Unofficially, Bootstrap should look and behave well enough in Chromium and Chrome for Linux, Firefox for
+            Linux, and Internet Explorer 9, though they are not officially supported</p>
+        <P>For a list of some of the browser bugs that Bootstrap has to grapple with, see our Wall of browser bugs.</P>
+    </article>
+</section>
+
+<section class="main-section" id="JavaScript">
+    <header>JavaScript</header>
+    <article>
+        <p>
+            Global variables are in fact properties of the global object. In web
+            pages the global object is window, so you can set and access global
+            variables using the window.variable syntax.
+        </p>
+
+        <h2>Individual or compiled </h2>
+        <p>
+            Plugins can be included individually (using Bootstrap’s individual *.js files), or all at once using
+            bootstrap.js or the minified bootstrap.min.js (don’t include both).
+        </p>
+        <h2>Dependencies</h2>
+        <p>Some plugins and CSS components depend on other plugins. If you include plugins individually, make sure
+            to check for these dependencies in the docs. Also note that <b>all plugins depend on jQuery</b> (this means
+            jQuery must be included before the plugin files). Consult our package.json to see which versions of
+            jQuery are supported.
+
+        </p>
+        <h2>Data attributes </h2>
+        <p>Nearly all Bootstrap plugins can be enabled and configured through HTML alone with data attributes (our
+            preferred way of using JavaScript functionality). Be sure to <b>only use one set of data attributes on a
+                single
+                element</b> (e.g., you cannot trigger a tooltip and modal from the same button.)</p>
+        <p>However, in some situations it may be desirable to disable this functionality. To disable the data attribute
+            API, unbind all events on the document namespaced with data-api like so:</p>
+        <pre>
+<code class="textcode">$(document).off('.data-api')</code>
+</pre>
+        <p>Alternatively, to target a specific plugin, just include the plugin’s name as a namespace along with the
+            data-api namespace like this:</p>
+        <pre>
+<code class="textcode">$(document).off('.alert.data-api')</code>
+</pre>
+    </article>
+</section>
+
+<section class="main-section" id="Events">
+    <header>Events</header>
+    <article>
+        <p>
+            Bootstrap provides custom events for most plugins’ unique actions. Generally, these come in an infinitive
+            and past participle form - where the infinitive (ex. show) is triggered at the start of an event, and its
+            past participle form (ex. shown) is triggered on the completion of an action.
+        </p>
+        <p>All infinitive events provide preventDefault() functionality. This provides the ability to stop the execution
+            of an action before it starts. Returning false from an event handler will also automatically call
+            <code class="textcode">preventDefault().</code>
+        </p>
+        <pre>
+<code class="textcode">
+$('#myModal').on('show.bs.modal', function (e) {
+if (!data) return e.preventDefault() // stops modal from being shown
+})
+</code>
+</pre>
+    </article>
+</section>
+
+<section class="main-section" id="Theming_Bootstrap">
+    <header>Theming Bootstrap </header>
+    <article>
+        <p>Customize Bootstrap 4 with our new built-in Sass variables for global style preferences for easy theming and
+            component changes.
+        </p>
+
+        <h2>Introduction</h2>
+        <p>In Bootstrap 3, theming was largely driven by variable overrides in LESS, custom CSS, and a separate theme
+            stylesheet that we included in our dist files. With some effort, one could completely redesign the look of
+            Bootstrap 3 without touching the core files. Bootstrap 4 provides a familiar, but slightly different
+            approach.</p>
+        <p>Now, theming is accomplished by Sass variables, Sass maps, and custom CSS. There’s no more dedicated theme
+            stylesheet; instead, you can enable the built-in theme to add gradients, shadows, and more.</p>
+
+        <h2>Sass </h2>
+        <p>Utilize our source Sass files to take advantage of variables, maps, mixins, and more. </p>
+
+        <h2>File structure </h2>
+        <p>Whenever possible, avoid modifying Bootstrap’s core files. For Sass, that means creating your own stylesheet
+            that imports Bootstrap so you can modify and extend it. Assuming you’re using a package manager like npm,
+            you’ll have a file structure that looks like this: </p>
+        <pre>
+<code>
+your-project/
+├── scss
+│   └── custom.scss
+└── node_modules/
+└── bootstrap
+├── js
+└── scss
+</code>
+</pre>
+
+        <p>If you’ve downloaded our source files and aren’t using a package manager, you’ll want to manually setup
+            something similar to that structure, keeping Bootstrap’s source files separate from your own.</p>
+
+        <pre>
+<code>
+your-project/
+├── scss
+│   └── custom.scss
+└── bootstrap/
+├── js
+└── scss
+</code>
+</pre>
+    </article>
+</section>
+
+<section class="main-section" id="Build_tools">
+    <header>Build tools </header>
+    <article>
+        <p>Learn how to use Bootstrap’s included npm scripts to build our documentation, compile source code, run tests,
+            and more. </p>
+
+        <h2>Tooling setup </h2>
+        <p>Bootstrap uses NPM scripts for its build system. Our package.json includes convenient methods for working
+            with the framework, including compiling code, running tests, and more. </p>
+        <p>
+            To use our build system and run our documentation locally, you’ll need a copy of Bootstrap’s source files
+            and Node. Follow these steps and you should be ready to rock:
+        </p>
+
+        <ol>
+            <li>Download and install Node.js, which we use to manage our dependencies.</li>
+            <li>Navigate to the root /bootstrap directory and run npm install to install our local dependencies listed
+                in package.json.</li>
+            <li>Install Ruby, install Bundler with gem install bundler, and finally run bundle install. This will
+                install all Ruby dependencies, such as Jekyll and plugins.
+                <ul>
+                    <li><b>Windows users:</b> Read this guide to get Jekyll up and running without problems.</li>
+                </ul>
+        </ol>
+        <p>When completed, you’ll be able to run the various commands provided from the command line.</p>
+    </article>
+</section>
+
+<section class="main-section" id="Webpack">
+    <header>Webpack </header>
+    <article>
+        <p>Learn how to include Bootstrap in your project using Webpack 3. </p>
+
+        <h2>Installing Bootstrap</h2>
+        <p><a href="#">Install bootstrap</a> as a Node.js module using npm. </p>
+
+        <h2>Importing JavaScript </h2>
+        <p>
+            Import Bootstrap’s JavaScript by adding this line to your app’s entry point (usually <code
+                class="textcode">index.js</code> or <code class="textcode">app.js</code>):
+        </p>
+        <code class="textcode">import 'bootstrap';        </code>
+        <p>Alternatively, you may <b>import plugins individually</b> as needed:</p>
+        <code class="textcode">
+import 'bootstrap/js/dist/util'; <br>
+import 'bootstrap/js/dist/dropdown';
+...
+</code>
+
+        <p>The following while loop iterates as long as n is less than three:</p>
+
+        <code>var n = 0; var x = 0; while (n &lt; 3) { n++; x += n; }</code>
+        <p>
+            With each iteration, the loop increments n and adds that value to x.
+            Therefore, x and n take on the following values:
+        </p>
+
+        <ul>
+            <li>After the first pass: n = 1 and x = 1</li>
+            <li>After the second pass: n = 2 and x = 3</li>
+            <li>After the third pass: n = 3 and x = 6</li>
+        </ul>
+        <p>
+            After completing the third pass, the condition n &lt; 3 is no longer
+            true, so the loop terminates.
+        </p>
+    </article>
+</section>
+
+<section class="main-section" id="Accessibility">
+    <header>Accessibility </header>
+    <article>
+        <p>A brief overview of Bootstrap’s features and limitations for the creation of accessible content. </p>
+        <p>Bootstrap provides an easy-to-use framework of ready-made styles, layout tools, and interactive components,
+            allowing developers to create websites and applications that are visually appealing, functionally rich, and
+            accessible out of the box. </p>
+
+        <h2>Overview and Limitations</h2>
+        <p>The overall accessibility of any project built with Bootstrap depends in large part on the author’s markup,
+            additional styling, and scripting they’ve included. However, provided that these have been implemented
+            correctly, it should be perfectly possible to create websites and applications with Bootstrap that fulfill
+            WCAG 2.0 (A/AA/AAA), Section 508 and similar accessibility standards and requirements. </p>
+
+        <h2>Structural markup</h2>
+        <p>Bootstrap’s styling and layout can be applied to a wide range of markup structures. This documentation aims
+            to provide developers with best practice examples to demonstrate the use of Bootstrap itself and illustrate
+            appropriate semantic markup, including ways in which potential accessibility concerns can be addressed. </p>
+
+        <h2>Interactive components </h2>
+        <p>Bootstrap’s interactive components—such as modal dialogs, dropdown menus and custom tooltips—are designed to
+            work for touch, mouse and keyboard users. Through the use of relevant WAI-ARIA roles and attributes, these
+            components should also be understandable and operable using assistive technologies (such as screen readers).
+        </p>
+
+    </article>
+</section>
+
+</main>
+<script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
+
+
+</body>
+
+</html>
+
+Source: https://raw.githubusercontent.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/main/Documentation%20Page/index.js
+function myFunction0() {
+    var copyText = document.getElementById("select-this0");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999)
+    document.execCommand("copy");
+}
+
+function myFunction() {
+    var copyText = document.getElementById("select-this2");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999)
+    document.execCommand("copy");
+}
+
+function myFunction4() {
+    var copyText = document.getElementById("select-this4");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999)
+    document.execCommand("copy");
+}
+
+function myFunction5() {
+    var copyText = document.getElementById("select-this5");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999)
+    document.execCommand("copy");
+}
+
+source: https://github.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/blob/main/Documentation%20Page/style.css
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    min-width: 290px;
+    color: #4d4e53;
+    background-color: #ffffff;
+    font-family: 'Open Sans', Arial, sans-serif;
+    line-height: 1.5;
+}
+
+#navbar {
+    position: fixed;
+    min-width: 290px;
+    top: 0px;
+    left: 0px;
+    width: 300px;
+    height: 100%;
+    border-right: solid;
+    border-color: rgba(0, 22, 22, 0.4);
+}
+
+header {
+    color: black;
+    margin: 10px;
+    text-align: center;
+    font-size: 1.8em;
+    font-weight: thin;
+}
+
+#main-doc header {
+    text-align: left;
+    margin: 0px;
+}
+
+#navbar ul {
+    height: 88%;
+    padding: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#navbar li {
+    color: #4d4e53;
+    border-top: 1px solid;
+    list-style: none;
+    position: relative;
+    width: 100%;
+}
+
+#navbar a {
+    display: block;
+    padding: 10px 30px;
+    color: #4d4e53;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#main-doc {
+    position: absolute;
+    margin-left: 310px;
+    padding: 20px;
+    margin-bottom: 110px;
+}
+
+section article {
+    color: #4d4e53;
+    margin: 15px;
+    font-size: 0.96em;
+}
+
+section li {
+    margin: 15px 0px 0px 20px;
+}
+
+/* code {
+    display: block;
+    text-align: left;
+    white-space: pre-line;
+    position: relative;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 2;
+    background-color: #f7f7f7;
+    padding: 15px;
+    margin: 10px;
+    border-radius: 5px;
+} */
+
+.textcode {
+    font-family: Consolas, "courier new";
+    color: crimson;
+    background-color: #f1f1f1;
+    /* padding: 2px; */
+    font-size: 115%;
+}
+
+textarea {
+    /* margin: 4px, 4px; */
+    padding: 4px;
+    /* background-color: #08c708; */
+    width: 75%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+.button {
+    display: inline-block;
+    position: absolute;
+    font-size: 0.9em;
+    background-color: rgb(230, 14, 43);
+    color: #fff;
+    transition: all 300ms ease;
+    cursor: pointer;
+    width: 20%;
+    height: 50px;
+    margin-left: 20px;
+    margin-top: -5px;
+}
+
+.button:hover {
+    background-color: rgb(24, 40, 185);
+    color: #fff;
+}
+
+.startertemplate {
+    text-align-last: left;
+    float: left;
+    width: 100%;
+    height: 400px;
+}
+
+.downloadbtn {
+    font-weight: 500;
+    color: #7952b3;
+    border-color: #7952b3;
+    width: 100px;
+    height: 40px;
+}
+
+table {
+    border: 1px solid #111;
+    width: 800px;
+    height: 150px;
+    border-collapse: collapse;
+}
+
+th, td {
+    text-align: left;
+    border: 1px solid #111;
+    padding: .75rem;
+}
+
+tr div {
+    width: 250px;
+}
+
+.included {
+    color: red;
+}
+
+.notincluded {
+    color: rgb(136, 226, 17);
+    background-color: #f8f9fa;
+}
+
+a {
+    text-decoration: none;
+}
+
+@media only screen and (max-width: 600px) {
+    #navbar ul {
+        border: 1px solid;
+        height: 207px;
+    }
+    #navbar {
+        position: relative;
+        top: 0;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        max-height: 275px;
+        border: none;
+        z-index: 1;
+    }
+    #main-doc {
+        margin: 0;
+        width: 100%;
+    }
+    .button {
+        position: relative;
+        font-size: 0.9em;
+        background-color: rgb(230, 14, 43);
+        color: #fff;
+        transition: all 300ms ease;
+        cursor: pointer;
+        width: 150px;
+        height: 50px;
+        margin-left: 0;
+        margin-top: 5px;
+        margin-bottom: 10px;
+    }
+    .tablediv {
+        overflow-x: auto;
+    }
+    textarea {
+        width: 100%;
+        margin-top: 15px;
+    }
+    .downloadbtn {
+        margin: 10px 0 10px 0;
+        width: 50%;
+    }
+}
+
+source: https://raw.githubusercontent.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/main/Portfolio%20website/index.html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/nav.css">
+    <link rel="stylesheet" href="style/welcome.css">
+    <link rel="stylesheet" href="style/service.css">
+    <link rel="stylesheet" href="style/projects.css">
+    <link rel="stylesheet" href="style/contact.css">
+</head>
+
+<body>
+    <header>
+        <button class="nav-toggle" aria-label="toggle navigation">
+            <span class="hamburger"></span>
+        </button>
+        <nav class="nav" id="navbar">
+            <ul class="nav__list">
+                <label>
+                    <li class="nav__item">
+                        <a href="#welcome-section" data-text="Home" class="nav__link">Home</a>
+                    </li>
+                </label>
+                <label>
+                    <li class="nav__item">
+                        <a href="#services" class="nav__link">Service</a>
+                    </li>
+                </label>
+                <label>
+                    <li class="nav__item">
+                        <a href="#projects" class="nav__link">Work</a>
+                    </li>
+                </label>
+                <label>
+                    <li class="nav__item">
+                        <a href="#contact" class="nav__link">Contact</a>
+                    </li>
+                </label>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="welcome-section" class="welcome-section">
+        <div class="welcomecontainer">
+            <div class="hello">
+                <h1>Hi, I'm Sumit. 👋</h1>
+                <br>
+                <p>Frontend web developer with a passion for designing a UI/UX & Graphic </p>
+                <br>
+                <a href="https://github.com/smthari" target="_blank" id="profile-link">
+                    <button class="btn draw-border">
+
+                        Learn more..
+                    </button>
+                </a>
+            </div>
+
+            <div class="profile">
+                <img
+                    src="https://avatars0.githubusercontent.com/u/65243909?s=460&u=c992678563e9b9ff0dd0e7ef7c16ecf4a7603ba6&v=4">
+            </div>
+        </div>
+    </section>
+
+    <section id="services">
+        <h1>⬇️ What I Do ⬇️</h1>
+        <div class="container">
+            <div class="row">
+
+                <div class="service-colum">
+                    <div class="main">
+                        <div class="service">
+                            <div class="service-logo"><i class="fas fa-paint-brush"></i></div>
+                            <h4>Web Design</h4>
+                            <p>⚡ Designing highly attractive user interface for mobile and web applications
+                                ⚡ Customizing logo designs and building logos from scratch
+                                ⚡ Creating the flow of application functionalities to optimize user experience</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-colum">
+                    <div class="main">
+                        <div class="service">
+                            <div class="service-logo"><i class="fas fa-code"></i></div>
+                            <h4>Development</h4>
+                            <p>⚡ Building resposive website front end using React-Redux
+                                ⚡ Developing mobile applications using Flutter, React Native and solo android apps using
+                                Kotlin
+                                ⚡ Creating application backend in Node, Express & Flask</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-colum">
+                    <div class="main">
+                        <div class="service">
+                            <div class="service-logo"><i class="fas fa-palette"></i></div>
+                            <h4>Graphic Design</h4>
+                            <p>⚡ Designing highly attractive illustrations, logos, layouts and photos.
+                                ⚡ Customizing logo designs and building logos from scratch
+                                ⚡ visual aspects of websites, books, magazines, product packaging,</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects">
+        <h1> ⬇️ Projects ⬇️ </h1>
+        <div class="project-grid">
+            <div class="card">
+                <a href="https://codepen.io/smtharijan/pen/rNMJrqo" target="_blank">
+                    <img src="images/project1.png">
+                </a>
+                <div class="project-links">
+                    <div class="text">
+                        <h3 class="project-tile">Tribute page</h3>
+                    </div>
+                    <div class="icons">
+                        <a href="https://codepen.io/smtharijan/pen/rNMJrqo" target="_blank">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                        <a href="https://github.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/tree/main/Tribute%20page" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <a href="https://codepen.io/smtharijan/pen/mdrXGOw" target="_blank">
+                    <img src="images/project2.png">
+                </a>
+                <div class="project-links">
+                    <div class="text">
+                        <h3 class="project-tile">Survey form</h3>
+                    </div>
+                    <div class="icons">
+                        <a href="https://codepen.io/smtharijan/pen/mdrXGOw" target="_blank">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                        <a href="https://github.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/tree/main/Survey%20form" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <a href="https://codepen.io/smtharijan/pen/OJRvyEb" target="_blank">
+                    <img src="images/project3.png">
+                </a>
+                <div class="project-links">
+                    <div class="text">
+                        <h3 class="project-tile">Product landing</h3>
+                    </div>
+                    <div class="icons">
+                        <a href="https://codepen.io/smtharijan/pen/OJRvyEb" target="_blank">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                        <a href="https://github.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/tree/main/Product%20Landing%20Page" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h1>⬇️ Contact me ⬇️</h1>
+        <div class="sm">
+            <a href="https://github.com/smthari" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://www.instagram.com/coding.batch/" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.t.me/coding_batch" target="_blank"><i class="fab fa-telegram"></i></a>
+            <a href="mailto:codingbatchig@gmail.com"><i class="far fa-envelope"></i></a>
+        </div>
+    </section>
+
+    <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
+    <script src="https://kit.fontawesome.com/dd8c49730d.js" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
+
+source: https://raw.githubusercontent.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/main/Portfolio%20website/script.js
+const navToggle = document.querySelector('.nav-toggle');
+const navLinks = document.querySelectorAll('.nav__link')
+
+navToggle.addEventListener('click', () => {
+    document.body.classList.toggle('nav-open');
+});
+
+navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        document.body.classList.remove('nav-open');
+    })
+})
+
+source: https://raw.githubusercontent.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/main/Portfolio%20website/style/contact.css
+.sm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* min-height: 30vh; */
+    /* padding-bottom: 50px; */
+    margin: 15px;
+}
+
+#contact h1 {
+    text-align: center;
+    /* margin: 50px auto 20px; */
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.sm a {
+    display: inline-block;
+    font-size: 40px;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    text-align: center;
+    color: #fff;
+    margin: 0 16px;
+    transition: .4s linear;
+    position: relative;
+}
+
+.sm a::before, .sm a::after {
+    content: '';
+    position: absolute;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    transition: .4s linear;
+}
+
+.sm a:hover {
+    transform: scale(.8);
+}
+
+.sm a:hover::before {
+    border-radius: 50%;
+    border-left: 4px solid;
+    border-right: 4px solid;
+    transform: skewX(20deg);
+}
+
+.sm a:hover::after {
+    border-radius: 50%;
+    border-top: 4px solid;
+    border-bottom: 4px solid;
+    transform: skewY(-20deg);
+}
+
+source: https://raw.githubusercontent.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/main/Portfolio%20website/style/nav.css
+header {
+    top: 0;
+    position: fixed;
+    width: 100%;
+}
+
+.nav__list {
+    list-style: none;
+    display: flex;
+    height: 100%;
+    justify-content: space-evenly;
+    margin: 0;
+    padding: 8px;
+    background-color: rgb(240, 240, 20);
+}
+
+.nav__link {
+    color: inherit;
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-h2);
+    text-decoration: none;
+}
+
+.nav__link:hover {
+    color: var(--clr-accent);
+}
+
+.nav-toggle {
+    position: absolute;
+}
+
+label {
+    position: relative;
+    margin-right: -410px;
+}
+
+.nav__item {
+    color: #111;
+}
+
+@media (max-width: 800px) {
+    .nav {
+        display: flex;
+        justify-content: center;
+        position: fixed;
+        background: var(--clr-dark);
+        color: var(--clr-light);
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        transform: translateY(100%);
+        transition: transform 250ms cubic-bezier(.5, 0, .5, 1);
+    }
+    .nav__list {
+        list-style: none;
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        justify-content: space-evenly;
+        margin: 0;
+        padding: 0;
+        background-color: transparent;
+    }
+    .nav__link {
+        color: inherit;
+        font-weight: var(--fw-bold);
+        font-size: var(--fs-h2);
+        text-decoration: none;
+    }
+    .nav__link:hover {
+        color: var(--clr-accent);
+    }
+    .nav-toggle {
+        padding: .5em;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+        position: absolute;
+        right: 1em;
+        top: 1em;
+        z-index: 1000;
+        outline: none;
+    }
+    .nav-open .nav {
+        transform: translateX(0);
+    }
+    .nav-open .nav-toggle {
+        position: fixed;
+    }
+    .nav-open .hamburger {
+        transform: rotate(.625turn);
+    }
+    .nav-open .hamburger::before {
+        transform: rotate(90deg) translateX(-6px);
+    }
+    .nav-open .hamburger::after {
+        opacity: 0;
+    }
+    .hamburger {
+        display: block;
+        position: relative;
+    }
+    .hamburger, .hamburger::before, .hamburger::after {
+        background: var(--clr-accent);
+        width: 2em;
+        height: 3px;
+        border-radius: 1em;
+        transition: transform 250ms ease-in-out;
+    }
+    .hamburger::before, .hamburger::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+    }
+    .hamburger::before {
+        top: 6px;
+    }
+    .hamburger::after {
+        bottom: 6px;
+    }
+    label {
+        position: relative;
+        margin: 2px;
+    }
+    label::before {
+        position: absolute;
+        content: "";
+        top: 0;
+        left: -3rem;
+        width: 0.25rem;
+        height: 100%;
+        background: var(--menu-link-active-color);
+        transition: 2s;
+        margin-left: 5px;
+    }
+    label li {
+        position: relative;
+        background: linear-gradient(var(--menu-link-active-color) 0 100%) left/0 no-repeat;
+        color: transparent;
+        background-clip: text;
+        -webkit-background-clip: text;
+        transition: background-size 0.45s 0.04s;
+    }
+    label li::before {
+        position: absolute;
+        content: attr(data-text);
+        z-index: -1;
+        color: #fff;
+    }
+    label:nth-child(1) {
+        --menu-link-active-color: rgb(252, 252, 128);
+    }
+    label:nth-child(2) {
+        --menu-link-active-color: rgb(241, 100, 100);
+    }
+    label:nth-child(3) {
+        --menu-link-active-color: rgb(243, 161, 10);
+    }
+    label:nth-child(4) {
+        --menu-link-active-color: rgb(21, 185, 240);
+        ;
+    }
+    label:hover::before {
+        left: var(--speed);
+    }
+    .nav__item {
+        color: #fff;
+    }
+    header {
+        top: 0;
+        position: absolute;
+        width: 100%;
+    }
+}
+source: https://raw.githubusercontent.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/main/Portfolio%20website/style/projects.css
+.card {
+    height: 23rem;
+    width: 21rem;
+    margin: 1rem;
+    box-shadow: 3px 2px 10px grey;
+    color: #fff;
+}
+
+.card img {
+        opacity: 0.5;
+        transition: opacity 0.5s ease;
+}
+
+.card img:hover {
+    opacity: 1;
+}
+
+.project-grid {
+    min-height: 60vh;
+    width: 100%;
+    flex-wrap: wrap;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#projects h1 {
+    text-align: center;
+    margin: 50px auto 20px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+#projects img {
+    width: 100%;
+    border-bottom: 1px solid #55198b;
+    height: 80%;
+}
+
+.project-links {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#projects {
+    padding: 5%;
+}
+
+.icons, a {
+    text-decoration: none;
+    color: #fff;
+}
+
+i {
+    transform: scale(0.6);
+    transition: 0.5s linear;
+}
+i:hover {
+    color: rgb(240, 240, 20);
+}
+source: https://raw.githubusercontent.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/main/Portfolio%20website/style/service.css
+#services h1 {
+    text-align: center;
+    margin: 50px auto 20px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.main {
+    width: 100%;
+    min-height: 380px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.service {
+    background: #111;
+    padding: 30px;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 0;
+    z-index: 1;
+    box-shadow: 0 0 25px -5px rgb(253, 253, 253);
+    transition: transform .8s;
+    height: 405px;
+    margin: 50px;
+    color: #fff;
+}
+
+.service-logo {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    margin: -90px auto 0;
+    background: #111;
+    border: 18px solid rgb(240, 240, 20);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.service h4 {
+    height: 35px;
+    width: 80%;
+    margin: 50px auto;
+    background: #111;
+    position: relative;
+}
+
+.service h4::after,
+.service h4::before {
+    content: '';
+    width: 40px;
+    height: 30px;
+    position: absolute;
+    z-index: -1;
+}
+
+.service h4::after {
+    background: linear-gradient(to right, #fff, rgb(240, 240, 20));
+    right: -5px;
+    top: -5px;
+}
+
+.service h4::before {
+    background: linear-gradient(to right, rgb(240, 240, 20), #fff);
+    left: -5px;
+    bottom: -5px;
+}
+
+.main:hover .service {
+    transform: translateY(-40px);
+}
+
+.row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 180px;
+}
+
+.service-colum {
+    flex: 3;
+    background: #111;
+}
+
+i {
+    font-size: 50px;
+}
+
+@media (max-width: 800px) {
+    #services h1 {
+        margin: 50px auto -150px;
+    }
+    .row {
+        display: block;
+    }
+    .main {
+        min-height: 500px;
+    }
+    .service {
+        margin: 15px;
+        height: 424px;
+    }
+    .service-colum {
+        margin-top: 40px;
+    }
+}
+source: https://raw.githubusercontent.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/main/Portfolio%20website/style/style.css
+html {
+    scroll-behavior: smooth;
+}
+
+:root {
+    --ff-primary: 'Source Sans Pro', sans-serif;
+    --fw-bold: 600;
+    --clr-light: rgb(240, 240, 20);
+    --clr-dark: #303030;
+    --clr-accent: #16e0bd;
+    --fs-h2: 1.25rem;
+    --fs-body: 1rem;
+    --speed: 180px;
+}
+
+@media (max-width: 800px) {
+    :root {
+        --fs-h2: 1.75rem;
+        --fs-body: 1.125rem;
+        --speed: 300px;
+        --fw-bold: 900;
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #111111;
+    color: var(--clr-dark);
+    margin: 0;
+    font-family: var(--ff-primary);
+    font-size: var(--fs-body);
+    line-height: 1.6;
+    user-select: none;
+}
+source: https://raw.githubusercontent.com/smthari/Freecodecamp-Responsive-Web-Design-Projects/main/Portfolio%20website/style/welcome.css
+.welcome-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  padding: 5%;
+}
+
+.welcomecontainer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+}
+
+.hello {
+  flex: 0 0 50%;
+  max-width: 50%;
+}
+
+.hello h1 {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  color: var(--clr-light);
+}
+
+.hello p {
+  color: var(--clr-accent);
+}
+
+.profile {
+  max-width: 50%;
+}
+
+.profile img {
+  border-radius: 50%;
+  right: 50%;
+}
+
+/* css for leran more button  */
+
+.draw-border {
+  box-shadow: inset 0 0 0 4px var(--clr-accent);
+  color: var(--clr-accent);
+  transition: color 0.25s;
+  position: relative;
+}
+
+.draw-border::before, .draw-border::after {
+  border: 0 solid transparent;
+  box-sizing: border-box;
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  width: 0;
+  height: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.draw-border::before {
+  border-bottom-width: 4px;
+  border-left-width: 4px;
+}
+
+.draw-border::after {
+  border-top-width: 4px;
+  border-right-width: 4px;
+}
+
+.draw-border:hover {
+  color: rgb(192, 226, 97);
+}
+
+.draw-border:hover::before, .draw-border:hover::after {
+  border-color: yellow;
+  transition: border-color 0s, width 0.25s, height 0.25s;
+  width: 100%;
+  height: 100%;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  border-top-right-radius: 15px;
+  border-top-left-radius: 15px;
+}
+
+.draw-border:hover::before {
+  transition-delay: 0s, 0s, 0.25s;
+}
+
+.draw-border:hover::after {
+  transition-delay: 0s, 0.25s, 0s;
+}
+
+.btn {
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  line-height: 1.5;
+  padding: 1em 1em;
+  letter-spacing: 0.05rem;
+  font: 700 1.2rem 'Roboto Slab', sans-serif;
+  margin: -5px 0 0 -2px;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  border-top-right-radius: 15px;
+  border-top-left-radius: 15px;
+}
+
+.btn a {
+  text-decoration: none;
+  color: ;
+}
+
+@media (max-width: 800px) {
+  .welcomecontainer {
+    display: flex;
+    justify-content: unset;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  .hello {
+    max-width: 90%;
+    position: relative;
+    text-align: center;
+  }
+  .profile {
+    max-width: 100%;
+    margin-top: 50px;
+  }
+  .profile img {
+    width: 250px;
+    height: 250px;
+  }
+}
+
