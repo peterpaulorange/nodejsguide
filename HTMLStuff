@@ -1,0 +1,735 @@
+Source:https://github.com/smthari/Animated-search-bar/blob/master/index.html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        :root {
+            --primary-color: #4F29F0;
+            --height: 55px;
+        }
+
+        .search {
+            background: #ffffff;
+            width: auto;
+            height: var(--height);
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            top: 50%;
+            position: absolute;
+        }
+
+        .search input[type="text"] {
+            position: relative;
+            width: var(--height);
+            height: var(--height);
+            font: 400 16px 'Varela Round', sans-serif;
+            color: #414856;
+            border: 0;
+            box-sizing: border-box;
+            outline: none;
+            padding: 0 0 0 40px;
+            transition: width .6s ease;
+            z-index: 10;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .search input[type="text"]:focus {
+            z-index: 0;
+            opacity: 1;
+            width: 190px;
+        }
+
+        .search input[type="text"]:focus~.symbol::before {
+            width: 0%;
+        }
+
+        .search input[type="text"]:focus~.symbol:after {
+            clip-path: inset(0% 0% 0% 100%);
+            transition: -webkit-clip-path .04s linear .105s;
+            transition: clip-path .04s linear .105s;
+            transition: clip-path .04s linear .105s, -webkit-clip-path .04s linear .105s;
+        }
+
+        .search input[type="text"]:focus~.symbol .cloud {
+            top: -30px;
+            left: -30px;
+            transform: translate(0, 0);
+            transition: all .6s ease;
+        }
+
+        .search input[type="text"]:focus~.symbol .lens {
+            top: 20px;
+            left: 15px;
+            transform: translate(0, 0);
+            fill: var(--primary-color);
+            transition: top .5s ease .1s, left .5s ease .1s, fill .3s ease;
+        }
+
+        .search .symbol {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            z-index: 1;
+            display: -webkit-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .search .symbol:before {
+            content: "";
+            position: absolute;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-color);
+            z-index: -1;
+            transition: width .6s ease;
+        }
+
+        .search .symbol:after {
+            content: "";
+            position: absolute;
+            top: 21px;
+            left: 21px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            z-index: 1;
+            clip-path: inset(0% 0% 0% 0%);
+            transition: clip-path .04s linear .225s;
+
+        }
+
+        .search .symbol .cloud,
+        .search .symbol .lens {
+            position: absolute;
+            fill: #fff;
+            stroke: none;
+            top: 50%;
+            left: 50%;
+        }
+
+        .search .symbol .cloud {
+            width: 35px;
+            height: 32px;
+            transform: translate(-50%, -60%);
+            transition: all .6s ease;
+        }
+
+        .search .symbol .lens {
+            fill: #fff;
+            width: 16px;
+            height: 16px;
+            z-index: 2;
+            top: 24px;
+            left: 24px;
+            transition: top .3s ease, left .3s ease, fill .2s ease .2s;
+        }
+
+        body {
+            background: #b7bfda;
+            height: 100%;
+            font: 400 16px 'Varela Round', sans-serif;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="search">
+        <input type="text" placeholder="search" />
+        <div class="symbol">
+            <svg class="cloud">
+                <use xlink:href="#cloud" />
+            </svg>
+            <svg class="lens">
+                <use xlink:href="#lens" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- SVG -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35" id="cloud">
+            <path d="M31.714,25.543c3.335-2.17,4.27-6.612,2.084-9.922c-1.247-1.884-3.31-3.077-5.575-3.223h-0.021
+C27.148,6.68,21.624,2.89,15.862,3.931c-3.308,0.597-6.134,2.715-7.618,5.708c-4.763,0.2-8.46,4.194-8.257,8.919
+c0.202,4.726,4.227,8.392,8.991,8.192h4.873h13.934C27.784,26.751,30.252,26.54,31.714,25.543z" />
+        </symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" id="lens">
+            <path d="M15.656,13.692l-3.257-3.229c2.087-3.079,1.261-7.252-1.845-9.321c-3.106-2.068-7.315-1.25-9.402,1.83
+s-1.261,7.252,1.845,9.32c1.123,0.748,2.446,1.146,3.799,1.142c1.273-0.016,2.515-0.39,3.583-1.076l3.257,3.229
+c0.531,0.541,1.404,0.553,1.95,0.025c0.009-0.008,0.018-0.017,0.026-0.025C16.112,15.059,16.131,14.242,15.656,13.692z M2.845,6.631
+c0.023-2.188,1.832-3.942,4.039-3.918c2.206,0.024,3.976,1.816,3.951,4.004c-0.023,2.171-1.805,3.918-3.995,3.918
+C4.622,10.623,2.833,8.831,2.845,6.631L2.845,6.631z" />
+        </symbol>
+    </svg>
+</body>
+
+</html>
+
+Source: https://raw.githubusercontent.com/smthari/Animated-Navigation-Bar/master/index.html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+
+
+
+<style>
+*,
+*:before,
+*:after {
+box-sizing: border-box;
+position: relative;
+/* chris: dont-judge-me; */
+}
+
+:root {
+--color-primary: #0c77ce;
+--duration: .3s;
+--easing: cubic-bezier(.5, 0, .5, 1);
+}
+
+html,
+body {
+overflow: hidden;
+height: 100%;
+width: 100%;
+margin: 0;
+padding: 0;
+background-color: var(--color-primary);
+font-size: 24px;
+font-weight: bold;
+
+}
+
+body {
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+nav {
+padding: 0.5em;
+}
+
+nav>.bg {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: #fff;
+box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+ul {
+width: 16em;
+margin: 0 auto;
+padding: 0;
+list-style: none;
+display: -webkit-box;
+display: flex;
+flex-direction: row;
+justify-content: center;
+}
+
+li {
+cursor: pointer;
+display: flex;
+flex-direction: row;
+align-items: center;
+border-radius: 1.5rem;
+padding: .2em .5em;
+z-index: 4;
+margin: 0 .25em;
+}
+
+li .background {
+background: var(--color-primary);
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+border-radius: 1rem;
+z-index: -1;
+display: none;
+will-change: transform;
+}
+
+li svg {
+flex-shrink: 0;
+display: inline-block;
+width: 1em;
+height: 1em;
+opacity: 0.4;
+transition: opacity var(--duration);
+}
+
+li>.label {
+display: none;
+margin-left: .5rem;
+font-size: .6em;
+}
+
+li[data-active] .label {
+display: block;
+opacity: 1;
+width: auto;
+}
+
+li[data-active] .background {
+display: block;
+}
+
+li[data-active]>svg {
+opacity: 1;
+}
+</style>
+
+</head>
+
+<body>
+<nav>
+<ul>
+<li>
+<svg data-flip-key="item-1-icon" viewBox="0 0 24 24">
+<path fill="#000000"
+d="M12 5.69L17 10.19V18H15V12H9V18H7V10.19L12 5.69M12 3L2 12H5V20H11V14H13V20H19V12H22L12 3Z" />
+</svg>
+<span class="label" data-flip-key="item-1-label">Home</span>
+<span class="background" data-flip-key="background"></span>
+</li>
+<li>
+<svg data-flip-key="item-2-icon" viewBox="0 0 24 24">
+<path fill="#000000"
+d="M13,7.5H18V9.5H13V7.5M13,14.5H18V16.5H13V14.5M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H19M19,19V5H5V19H19M11,6V11H6V6H11M10,10V7H7V10H10M11,13V18H6V13H11M10,17V14H7V17H10Z" />
+</svg>
+<span class="label" data-flip-key="item-2-label">Feed</span>
+<span class="background" data-flip-key="background"></span>
+</li>
+<li>
+<svg data-flip-key="item-3-icon" style="width:24px;height:24px" viewBox="0 0 24 24">
+<path fill="#000000"
+d="M16,17H7V10.5C7,8 9,6 11.5,6C14,6 16,8 16,10.5M18,16V10.5C18,7.43 15.86,4.86 13,4.18V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V4.18C7.13,4.86 5,7.43 5,10.5V16L3,18V19H20V18M11.5,22A2,2 0 0,0 13.5,20H9.5A2,2 0 0,0 11.5,22Z" />
+</svg>
+<span class="label" data-flip-key="item-3-label">Notifications</span>
+<span class="background" data-flip-key="background"></span>
+</li>
+<li>
+<svg data-flip-key="item-4-icon" viewBox="0 0 24 24">
+<path fill="#000000"
+d="M4,6H2V20A2,2 0 0,0 4,22H18V20H4V6M20,2A2,2 0 0,1 22,4V16A2,2 0 0,1 20,18H8A2,2 0 0,1 6,16V4A2,2 0 0,1 8,2H20M17,7A3,3 0 0,0 14,4A3,3 0 0,0 11,7A3,3 0 0,0 14,10A3,3 0 0,0 17,7M8,15V16H20V15C20,13 16,11.9 14,11.9C12,11.9 8,13 8,15Z" />
+</svg>
+<span class="label" data-flip-key="item-4-label">Accounts</span>
+<span class="background" data-flip-key="background"></span>
+</li>
+</ul>
+
+<div class="bg" data-flip-key="bg"></div>
+</nav>
+
+<script src='https://unpkg.com/flipping@latest/dist/flipping.web.js'></script>
+<script>
+  const elNav = document.querySelector('nav');
+
+const elLinks = Array.from(elNav.querySelectorAll("ul li"));
+
+elNav.style.setProperty('--total', elLinks.length);
+console.log(elLinks.length);
+
+const flipping = new Flipping({
+easing: 'cubic-bezier(.5, 0, .5, 1)'
+});
+
+elLinks.forEach( (elLink,i) => {
+elLink.addEventListener('click', flipping.wrap(()=>{
+elLinks.forEach( l => delete l.dataset.active );
+elLink.dataset.active = true;
+elNav.style.setProperty('--active', i);
+}));
+});
+
+
+elLinks[0].dataset.active = true;
+elNav.style.setProperty('--active', 0);
+</script>
+
+</body>
+
+</html>
+
+source: https://github.com/smthari/Chicken-Animated-Dance/blob/master/index.html
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+overflow: hidden;
+animation: colorChange 3.6s infinite linear both;
+}
+
+@keyframes colorChange{
+0%{
+background-color: #ddf08b;
+}
+20%{
+background-color: #edb272;
+}
+40%{
+background-color: #ed8272;
+}
+60%{
+background-color: #e0a6d2;
+}
+80%{
+background-color: #a2aceb;
+}
+100%{
+background-color: #a2ebcb;
+}
+}
+
+.container{
+width:100vw;
+height:100vh;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+.chick{
+display: flex;
+flex-direction:column;
+justify-content: center;
+align-items: center;
+position: relative;
+}
+
+.face{
+width:40vmin;
+height:35vmin;
+border-radius:50%;
+background-color: #f6f350;
+border-top:1vmin solid #974549;
+border-left:1vmin solid #974549;
+border-right:1vmin solid #974549;
+position: relative;
+animation: dance 0.6s infinite both;
+}
+
+.face:after{
+content:"";
+width:42vmin;
+height:25vmin;
+border-radius:40% 40% 50% 50%;
+background-color: #f6f350;
+border-bottom:1vmin solid #974549;
+border-left:1vmin solid #974549;
+border-right:1vmin solid #974549;
+position: absolute;
+bottom:-10vmin;
+left:-3vmin;
+}
+
+.l-face-cover{
+width:20vmin;
+height:12vmin;
+background-color: #f6f350;
+position: absolute;
+top:12vmin;
+left:1vmin;
+z-index: 2;
+}
+
+.r-face-cover{
+width:20vmin;
+height:12vmin;
+background-color: #f6f350;
+position: absolute;
+top:12vmin;
+right:1vmin;
+z-index: 2;
+}
+
+.l-eye, .r-eye{
+width:3vmin;
+height:6vmin;
+border-radius:50%;
+background-color: #86252d;
+position: absolute;
+top:18vmin;
+z-index: 3;
+}
+
+.l-eye{
+left:13vmin;
+}
+
+.r-eye{
+right:13vmin;
+}
+
+.beak{
+width:10vmin;
+height:8vmin;
+border-radius:49% 51% 49% 51% / 75% 77% 23% 25% ;
+border:1vmin solid #974549;
+background-color: #d4ae41;
+position: absolute;
+top:25vmin;
+left:14vmin;
+z-index: 2;
+}
+
+.l-feather, .r-feather{
+width:3vmin;
+height:10vmin;
+border-radius:50% 50% 0 0;
+background-color: #f1ed51;
+border:0.5vmin solid #974549;
+position: absolute;
+top:-10vmin;
+}
+
+.l-feather{
+left:15vmin;
+}
+
+.r-feather{
+right:17.3vmin;
+}
+
+.body{
+width:40vmin;
+height:25vmin;
+border-radius:50%;
+background-color: #f6f350;
+border:1vmin solid #9d4e3d;
+position: relative;
+top:3vmin;
+z-index: -1;
+animation: bodyMoves 0.6s alternate 0.3s infinite linear both;
+}
+
+.l-leg, .r-leg{
+width:5vmin;
+height:10vmin;
+background-color: #d4ae41;
+border-left:0.6vmin solid #9d4e3d;
+border-right:0.6vmin solid #9d4e3d;
+border-top:0.6vmin solid #9d4e3d;
+position: absolute;
+bottom:-8vmin;
+}
+
+.l-leg{
+left:4vmin;
+transform:rotateZ(20deg);
+}
+
+.r-leg{
+right:4vmin;
+transform:rotateZ(-20deg); 
+}
+
+.l-leg:after, .r-leg:after{
+content:"";
+width:10vmin;
+height:5vmin;
+border-radius:50%;
+background-color: #d2a940;
+border-left:0.6vmin solid #9d4e3d;
+border-right:0.6vmin solid #9d4e3d;
+border-bottom:0.6vmin solid #9d4e3d;
+position: absolute;
+bottom:-3vmin;
+}
+
+.l-leg:after{
+left:-4vmin;
+transform:rotateZ(-20deg);
+}
+
+.r-leg:after{
+right:-4vmin;
+transform:rotateZ(20deg);
+}
+
+.l-hand, .r-hand{
+width:10vmin;
+height:18vmin;
+border-radius:50%;
+background-color: #f6f350;
+border:0.6vmin solid #9d4e3d;
+position: absolute;
+}
+
+.l-hand{
+left:-4vmin;
+transform:rotateZ(10deg);
+z-index: 4;
+animation: lMoves 0.6s infinite both linear;
+}
+
+.r-hand{
+right:-4vmin;
+transform:rotateZ(-10deg);
+animation: rMoves 0.6s infinite both linear;
+}
+
+
+@keyframes lMoves{
+0%{
+transform:rotateZ(10deg);    
+}
+50%{
+transform:rotateZ(40deg);        
+}
+100%{
+transform:rotateZ(10deg);    
+}
+}
+
+@keyframes rMoves{
+0%{
+transform:rotateZ(-10deg);    
+}
+50%{
+transform:rotateZ(-40deg);        
+}
+100%{
+transform:rotateZ(-10deg);    
+}
+}
+
+@keyframes dance{
+0%{
+top:0;
+}
+50%{
+top:3vmin;
+}
+100%{
+top:0;
+}
+}
+
+@keyframes bodyMoves{
+0%{
+transform:rotateZ(10deg);
+}
+100%{
+transform:rotateZ(-10deg);    
+}
+}
+
+
+
+</style>
+
+<div class="container">
+<div class="chick"> 
+<div class="face">
+<div class="l-face-cover"></div>
+<div class="r-face-cover"></div>
+<div class="l-eye"></div>
+<div class="r-eye"></div>
+<div class="beak"></div>
+<div class="l-feather"></div>
+<div class="r-feather"></div>
+</div>
+<div class="body">
+<div class="l-leg"></div>
+<div class="r-leg"></div>
+<div class="l-hand"></div>
+<div class="r-hand"></div>
+</div>
+</div>
+</div>
+
+source: https://raw.githubusercontent.com/smthari/own-code-editor/master/editor.html
+<html>
+
+<head>
+    <title>Real Time Editor</title>
+    <script>
+        function refresh() {
+            var content = document.getElementById('editor').value;
+            document.getElementById('viewer').srcdoc = content;
+        }
+    </script>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: content-box;
+
+
+        }
+
+        .main {
+            background: #ecf0f1;
+            width: 100%;
+            height: 100%;
+            display: inline-flex;
+            position: fixed;
+
+
+        }
+
+        #editor {
+            width: 100%;
+            height: 100%;
+            margin: 5px;
+            border: 1px solid black;
+            background: black;
+            color: lightblue;
+            font-size: 18px;
+
+        }
+
+        #viewer {
+            background: white;
+            border: none;
+            width: 100%;
+            height: 100%;
+            margin: 5px;
+            border: 1px solid black;
+
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main">
+        <textarea id="editor" onkeyup="refresh()"></textarea>
+        <iframe id="viewer"></iframe>
+
+    </div>
+
+</body>
+
+</html>
