@@ -1,0 +1,313 @@
+package.json
+{
+  "name": "amazon-prices-tracking",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tom Baranowicz",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "cron": "^1.8.2",
+    "nodemailer": "^6.4.2",
+    "puppeteer": "^2.1.1"
+  }
+}
+
+##### index.js 
+const puppeteer = require('puppeteer');
+const $ = require('cheerio');
+const CronJob = require('cron').CronJob;
+const nodemailer = require('nodemailer');
+
+const url = 'https://www.amazon.com/Sony-Noise-Cancelling-Headphones-WH1000XM3/dp/B07G4MNFS1/';
+
+async function configureBrowser() {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto(url);
+    return page;
+}
+
+async function checkPrice(page) {
+    await page.reload();
+    let html = await page.evaluate(() => document.body.innerHTML);
+    // console.log(html);
+
+    $('#priceblock_dealprice', html).each(function() {
+        let dollarPrice = $(this).text();
+        // console.log(dollarPrice);
+        let currentPrice = Number(dollarPrice.replace(/[^0-9.-]+/g,""));
+
+        if (currentPrice < 300) {
+            console.log("BUY!!!! " + currentPrice);
+            sendNotification(currentPrice);
+        }
+    });
+}
+
+async function startTracking() {
+    const page = await configureBrowser();
+  
+    let job = new CronJob('* */30 * * * *', function() { //runs every 30 minutes in this config
+      checkPrice(page);
+    }, null, true, null, null, true);
+    job.start();
+}
+
+async function sendNotification(price) {
+
+    let transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: '*****@gmail.com',
+        pass: '*****'
+      }
+    });
+  
+    let textToSend = 'Price dropped to ' + price;
+    let htmlText = `<a href=\"${url}\">Link</a>`;
+  
+    let info = await transporter.sendMail({
+      from: '"Price Tracker" <*****@gmail.com>',
+      to: "*****@gmail.com",
+      subject: 'Price dropped to ' + price, 
+      text: textToSend,
+      html: htmlText
+    });
+  
+    console.log("Message sent: %s", info.messageId);
+  }
+
+startTracking();
+
+
+######. Camera
+App.js
+import React, { useRef, useEffect, useState } from "react";
+import ReactDOM from "react-dom";
+
+import * as cocoSsd from "@tensorflow-models/coco-ssd";
+import "@tensorflow/tfjs";
+
+const App = () => {
+  const [records, setRecords] = useState([]);
+
+  const videoElement = useRef(null);
+  const startButtonElement = useRef(null);
+  const stopButtonElement = useRef(null);
+
+  const shouldRecordRef = useRef(false);
+  const modelRef = useRef(null);
+  const recordingRef = useRef(false);
+  const lastDetectionsRef = useRef([]);
+  const recorderRef = useRef(null);
+
+  useEffect(() => {
+    async function prepare() {
+      startButtonElement.current.setAttribute("disabled", true);
+      stopButtonElement.current.setAttribute("disabled", true);
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: true
+          });
+          window.stream = stream;
+          videoElement.current.srcObject = stream;
+          const model = await cocoSsd.load();
+
+          modelRef.current = model;
+          startButtonElement.current.removeAttribute("disabled");
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }
+    prepare();
+  }, []);
+
+  async function detectFrame() {
+    if (!shouldRecordRef.current) {
+      stopRecording();
+      return;
+    }
+
+    const predictions = await modelRef.current.detect(videoElement.current);
+
+    let foundPerson = false;
+    for (let i = 0; i < predictions.length; i++) {
+      if (predictions[i].class == "person") {
+        foundPerson = true;
+      }
+    }
+
+    if (foundPerson) {
+      startRecording();
+      lastDetectionsRef.current.push(true);
+    } else if (lastDetectionsRef.current.filter(Boolean).length) {
+      startRecording();
+      lastDetectionsRef.current.push(false);
+    } else {
+      stopRecording();
+    }
+
+    lastDetectionsRef.current = lastDetectionsRef.current.slice(
+      Math.max(lastDetectionsRef.current.length - 10, 0)
+    );
+
+    requestAnimationFrame(() => {
+      detectFrame();
+    });
+  }
+
+  function startRecording() {
+    if (recordingRef.current) {
+      return;
+    }
+
+    recordingRef.current = true;
+    console.log("start recording");
+
+    recorderRef.current = new MediaRecorder(window.stream);
+
+    recorderRef.current.ondataavailable = function(e) {
+      const title = new Date() + "";
+      const href = URL.createObjectURL(e.data);
+      setRecords(previousRecords => {
+        return [...previousRecords, { href, title }];
+      });
+    };
+
+    recorderRef.current.start();
+  }
+
+  function stopRecording() {
+    if (!recordingRef.current) {
+      return;
+    }
+
+    recordingRef.current = false;
+    recorderRef.current.stop();
+    console.log("stopped recording");
+    lastDetectionsRef.current = [];
+  }
+
+  return (
+    <div className="p-3">
+      <div>
+        <video autoPlay playsInline muted ref={videoElement} />
+      </div>
+      <div>
+        <div class="btn-toolbar" role="toolbar">
+          <div className="btn-group mr-2" role="group">
+            <button
+              className="btn btn-success"
+              onClick={() => {
+                shouldRecordRef.current = true;
+                stopButtonElement.current.removeAttribute("disabled");
+                startButtonElement.current.setAttribute("disabled", true);
+                detectFrame();
+              }}
+              ref={startButtonElement}
+            >
+              Start
+            </button>
+          </div>
+          <div className="btn-group mr-2" role="group">
+            <button
+              className="btn btn-danger"
+              onClick={() => {
+                shouldRecordRef.current = false;
+                startButtonElement.current.removeAttribute("disabled");
+                stopButtonElement.current.setAttribute("disabled", true);
+                stopRecording();
+              }}
+              ref={stopButtonElement}
+            >
+              Stop
+            </button>
+          </div>
+        </div>
+        <div className="row p-3">
+          <h3>Records:</h3>
+          {!records.length
+            ? null
+            : records.map(record => {
+                return (
+                  <div className="card mt-3 w-100" key={record.title}>
+                    <div className="card-body">
+                      <h5 className="card-title">{record.title}</h5>
+                      <video controls src={record.href}></video>
+                    </div>
+                  </div>
+                );
+              })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+ReactDOM.render(<App />, document.getElementById("root"));
+
+##### index.html
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+    <title>React Starter</title>
+  </head>
+
+  <body>
+    <div id="root">empty</div>
+    <script src="./App.js"></script>
+  </body>
+</html>
+
+
+#### package.json
+
+{
+  "name": "react-starter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/App.js",
+  "scripts": {
+    "dev": "parcel src/index.html",
+    "build": "parcel build src/index.html --public-url ./"
+  },
+  "author": "Tom Baranowicz",
+  "license": "MIT",
+  "dependencies": {
+    "@tensorflow-models/coco-ssd": "^2.0.1",
+    "@tensorflow/tfjs": "^1.7.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4",
+    "prettier": "^1.19.1"
+  },
+  "browserslist": [
+    "last 1 Chrome versions"
+  ]
+}
+
